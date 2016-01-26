@@ -1,0 +1,65 @@
+\documentclass{article}
+\usepackage{fullpage}
+\begin{document}
+\section*{Modeling the gravity darkening signal of the giant planets in Kepler}
+The angle between a star's rotational axis and the normal to the orbital plane of the system's planets may provide clues about the history of the system.
+Spin orbit alignment has been suggested to be evidence for disk migration (Lin et al, 1996), while spin orbit misalignment has been suggested as evidence for dynamic migration.
+The main motivation for this project is to examine the population of planets around fast rotating stars, and their spin obliquities.
+
+Methods for measuring spin obliquity include doppler tomography, $V\sin i$, astroseismology, and the Rossiter-McLaughlin effect.
+The common method for measuring spin obliquity uses spectroscopic analysis to measure the Rossiter-McLaughlin effect.
+While the Rossiter-McLaughlin effect has been used on many systems, but isn't useful in all cases.
+For rapidly rotating stars, the spectral lines become broad and the spin obliquity angle can't be reliability measured.
+In this case, a photometric model can be used.
+
+
+The gravity darkening signal is a unique method for measuring the true spin obliquity angle of a planetary system.
+Rapid rotation causes a star to become oblate, and causes the star's poles to become hotter, and the equator to become cooler.
+This is known as the gravity darkening effect (von Zeipel,1924).
+A latitudinal differential in the of the stellar surface causes misaligned planets to produce asymmetric light curves.
+Gravity darkening is useful because, unlike other methods, it can constrain both the stellar obliquity and the sky-projected spin-orbit alignment.
+It is also useful for measuring spin obliquity angles for hot stars, which is currently an area lacking good measurements.
+
+
+While a photometric model may provide useful information for the features of a system, in practice this technique has provided varying results between teams and contradicts  results from doppler tomography ( in the case of KOI-13).
+Current methods use the default Van Zipel model and perform fits with linear limb darkening models.
+These methods can be improved with a two parameter limb darkening model, an updated gravity darkening model, and a modern fitting method, such as a Monte-Carlo Markov chain.
+
+
+In this project, we propose to improve the current methods of gravity darkening modelling, and provide self consistent modeling of the giant planet and super earth systems in the Kepler data.
+We will implement better models to describe gravity and limb darkening, and attempt to understand model bias and completeness in contrast to previous works.
+This will provide the first population of self-consistent measured spin obliquity angles for planets around hot stars.
+
+
+The project will start with the gravity darkening models used by Zhou \& Huang (2013), and make several critical improvements.
+Firstly, Zhou and \& Huang (2013) only made corrections from the gravity darkening effect to the regular Mandel \& Agol transit model, without the corrections for oblateness.
+Another, more advanced gravity darkening model implemented in Brandt \& Huang 2015a will also be used.
+This model is a better description of the observed surface of rapid rotating stars compared to the traditional Von Zipel model.
+In addition, we will also implement different limb-darkening laws and assess the impact of them to our final result.
+
+To determine the accuracy of these models, they will be applied to simulated light curves.
+This provides a controlled manner to test the models and determine what information can be recovered.
+This process sets a baseline and expectation for modeling real data.
+After testing the models on simulated data, the models will be applied to Kepler systems of interest.
+Modeling Kepler systems that have been extensively studied, such as Kepler 13, will provide a gauge for our modeling technique versus numerous results with other methods in both photometric and doppler based observations.
+
+
+The goal with the development process of this project is to create a pipeline useful for both this project, but also for future transit modeling effort.
+The packages available for modeling exoplanet transits lack the flexibility needed to model certain questions.
+The pipeline we create will be an excellent byproduct for this project.
+The models themselves will be created in C and implemented into a python package with Swig.
+This provides an easy to use and maintain code base, without sacrificing efficiency.
+The fitting process will use the EMCEE package to perform a Monte-Carlo Markov chain(MCMC).
+The difficulty in developing this pipeline will be creating a model that can run efficiently enough to be used with an MCMC.
+\section{Notes - January 26th}
+To Do:
+\begin{itemize}
+\item Complete simuTrans integrator\\
+\item No surface brightness testing\\
+\item Limb darkening model ( both quadratic and square root)\\
+\item Von Zipel gravity darkening model\\
+\item More complicated gravity darkening model\\
+\item Model on real data (starting with LD models)\\
+\item MCMC python wrapper\\
+\item Test on simulated data \& some real data\\
+\end{document}
