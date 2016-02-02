@@ -2,7 +2,7 @@ import scipy as sp
 import numpy as np
 import cfg_parse as cfg
 import cmd_parse as cmd
-from lc_par import read_lc
+#from lc_par import read_lc
 import os
 import sys
 import emcee
@@ -13,11 +13,15 @@ class parameter():
         self.upper=upper
         self.lower=lower
         self.name=name
-        #fitflag=0 indicate fixed parameter
         self.fitflag=fitflag 
+
         return
     def __str__(self):
-        return "%s:%f + %f - %f" % (self.name,self.val,self.upper-self.val,self.val=self.lower)
+        if self.fitflag==0:
+            return "%s:%f" % (self.name,self.val)
+        else:
+            return "%s:%f + %f - %f" % (self.name,self.val,self.upper-self.val,self.val-self.lower)
+
 
     def __call__(self):
         return self.val
@@ -32,7 +36,7 @@ class Params():
         free_params=[]
         for i in xrange(len(self.paramarr)):
             if self.paramarr[i].fitflag==1:
-                free_params.append(self.paramarr)
+                free_params.append(self.paramarr[i])
         return free_params
 
     def lc_chisq(self,lcdata):
@@ -56,11 +60,11 @@ class Params():
 
 class mcmc_engine():
     def __init__(self,options):
-        self.nwalkers=options.nwalkers
-        self.niter=options.niter
-        self.nburn=options.nburn
-        self.nthreads=options.nthreads
-        self.output=options.output
+        self.nwalkers=options.mcmc.nwalkers
+        self.niter=options.mcmc.niter
+        self.nburn=options.mcmc.nburn
+        self.nthreads=options.mcmc.nthreads
+        self.output=options.mcmc.output
         return
 
     def run_mcmc(self,fitparams,lcdata):
@@ -110,6 +114,8 @@ class mcmc_engine():
 def main():
     options=cmd.fitlc_parse()
     cfg.fitlc_parse(options)
+    print options
+    return
     fitparams=Params(options)
     MC=mcmc_engin(options)
     lcdata=read_lc(options)
