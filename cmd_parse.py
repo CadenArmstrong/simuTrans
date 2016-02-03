@@ -2,7 +2,7 @@
 #lc_parse.py use to parse all the command lines for functions realted to run lc function. 
 import optparse
 from fancyfont import colors
-
+import os
 tc=colors()
 
 def runcfg():
@@ -14,7 +14,13 @@ def runcfg():
 
 class fitlc_parse(object):
     def __init__(self):
-        self.cfgfile="example.cfg"
+        p=optparse.OptionParser()
+        p.add_option('--config','-c',default='example.cfg',help='the configuration file for the program')
+        options,arguments=p.parse_args()
+        #self.cfgfile="example.cfg"
+        self.cfgfile=options.config
+        if not os.path.exists(self.cfgfile):
+            raise IOError, "configuration file %s does not exist" % self.cfgfile
         self.mcmc=lambda:None
         self.lc=lambda:None
         self.params=[]

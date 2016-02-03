@@ -4,7 +4,7 @@
 
 import ConfigParser
 import cmd_parse as cmdp
-from fit_lc import parameter
+from parameter import parameter
 def set_parse(infile):
     p = ConfigParser.RawConfigParser()
   
@@ -13,12 +13,15 @@ def set_parse(infile):
     p.set('Section LC','inpath','') 
     p.set('Section LC','coljd',1) 
     p.set('Section LC','colmag',7) 
+    p.set('Section LC','cadence',0.02044) 
     p.set('Section LC','inlist','')
 
     p.add_section('Section MCMC')
-    p.set('Section MCMC','nwalker','')
-    p.set('Section MCMC','nburn','')
-    p.set('Section MCMC','niter','')
+    p.set('Section MCMC','nwalkers',1)
+    p.set('Section MCMC','nburn',50)
+    p.set('Section MCMC','niter',1000)
+    p.set('Section MCMC','nthreads',1)
+    p.set('Section MCMC','output','')
 
     p.add_section('Section FixedParameters')
     p.set('Section FixedParameters','fixparams','P,T0,Rratio') 
@@ -30,7 +33,7 @@ def set_parse(infile):
     p.set('Section FreeParameters','freeparams','sma,q1,q2,b') 
     p.set('Section FreeParameters','sma','0.1,0.02,0.02') 
     p.set('Section FreeParameters','q1','0.2,0.1,0.1') 
-    p.set('Section FreeParameters','q1','0.2,0.1,0.1') 
+    p.set('Section FreeParameters','q2','0.2,0.1,0.1') 
     p.set('Section FreeParameters','b','0.6,0.1,0.1') 
     
     p.add_section('This is a configure file for xxx package')
@@ -50,13 +53,14 @@ def fitlc_parse(options):
     #parse lc format
     try:
         setattr(options.lc,'infile',p.get('Section LC',"infile"))
+        setattr(options.lc,'cadence',p.get('Section LC',"cadence"))
     except ConfigParser.MissingSectionHeaderError:	
         raise 'Error: Section LC missing, excute set_parse to see example.cfg'
     except ConfigParser.NoOptionError:
         try:
             setattr(options.lc,'inlist',p.get('Section LC',"inlist"))
         except ConfigParser.NoOptionError:
-            raise 'Error: Can not find neither a light curve file or a list of light curve files for fitting purpose'
+            raise 'Error: Can not find neither a light curve file and its cadence or a list of light curve files for fitting purpose'
 
     try:
         setattr(options.lc,'inpath',p.get('Section LC',"inpath"))
@@ -75,9 +79,11 @@ def fitlc_parse(options):
         setattr(options.lc,'colmag',2)
 
     #parse fitting options
-    setattr(options.mcmc,'nwalker',int(p.get('Section MCMC',"nwalker")))
+    setattr(options.mcmc,'nwalkers',int(p.get('Section MCMC',"nwalkers")))
     setattr(options.mcmc,'nburn',int(p.get('Section MCMC',"nburn")))
     setattr(options.mcmc,'niter',int(p.get('Section MCMC',"niter")))
+    setattr(options.mcmc,'nthreads',int(p.get('Section MCMC',"nthreads")))
+    setattr(options.mcmc,'output',p.get('Section MCMC',"output"))
 
     #parse parameter options
     fixparams=p.get('Section FixedParameters','fixparams').split(',')
