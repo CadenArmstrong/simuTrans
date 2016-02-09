@@ -8,20 +8,51 @@ import sys
 import emcee
 from parameter import parameter
 from Emceewrapper import mcmc_engine
-
+#from transitmodel import transitmodel as tmodel 
 class Params():
     def __init__(self,options):
-        #self.model=
         self.paramarr=options.params
         vararr=np.zeros(len(self.paramarr)) 
         keyarr=[]
         self.lenfix=0
+        #self.transitmodel=tmodel()
         for i in xrange(len(self.paramarr)):
             vararr[i]=self.paramarr[i].val
             keyarr.append(self.paramarr[i].name)
             if self.paramarr[i].fitflag==0:
                 self.lenfix+=1
         self.paradic=dict(zip(keyarr,vararr))
+        self.checkparam()
+        
+        return
+    def __str__(self):
+        string=""
+        for key,value in self.paradic.iteritems():
+            string+="%s:%d\n" % (key,value)
+        return string
+
+    def checkparam(self):
+        #check and fill in all the default parameters
+
+        #need to modify the value depend on q1 and q2
+        if 'u1' not in self.paradic:
+            self.paradic['u1']= self.paradic['q1']
+        if 'u2' not in self.paradic:
+            self.paradic['u2']= self.paradic['q2']
+        #if 'b' not in self.paradic:
+        #    self.paradic['b']=self.paradic[]
+        if 'star_gridsize' not in self.paradic:
+            self.paradic['star_gridsize']=1000
+        if 'planet_gridsize' not in self.paradic:
+            self.paradic['planet_gridsize']=1000
+        if 'gd_beta' not in self.paradic:
+            self.paradic['gd_beta']=0
+        if 'star_f' not in self.paradic:
+            self.paradic['star_f']=0
+        if 'planet_f' not in self.paradic:
+            self.paradic['planet_f']=0
+        if 'e' not in self.paradic:
+            self.paradic['e']=0
         return
 
     def get_freeparams(self):
@@ -32,11 +63,31 @@ class Params():
             self.paradic[self.paramarr[i].name]=freeparamarr[i-self.lenfix]
         return 
 
+    def model(self,cadence):
+        self.tmodel.SetupStar(np.array([self.paradic['star_gridsize'],self.paradic['u1'],self.paradic['u2'],self.paradic['gd_beta'],self.paradic['star_f']]))
+        self.tmodel.Setupplanet(np.array([self.paradic['planet_gridsize'],self.paradic['b'],self.paradic['rratio'],self.paradic['plaent_f'],self.paradic['e']]))
+        phase=self.cal_phase(cadence)
+        model_lc=np.zeros(len(phase))
+        self.tmodel.RelativeFlux(phase,model_lc)
+        return model_lc
+
+    def cal_phase(self,cadence):
+        period=self.paradic['P']
+        epoch=self.paradic['T0']
+        phase=(cadence-epoch)-np.round(cadence-epoch)
+        return phase 
+
+    def check_init(self,lcdata):
+        model_lc=self.model(cadence)
+        plt.plot(cadence,lcdata[:,1],'.')
+        plt.plot(cadence,model_lc,'+')
+        plt.show()
+        return 
     def lc_chisq(self,freeparamarr,lcdata):
         lci = lcdata.copy()
         cadence = find_cadence(lci)
         self.updatedic(freeparamarr)
-        model_lc=self.model(self.paradic,cadence)
+        model_lc=self.model(cadence)
         x0 = [median(lcdata[:,1])]
         def minfunc(x0):
             flux_ii = lcdata[:,1] + x0[0]
@@ -58,9 +109,11 @@ def main():
     #print options
     fitparams=Params(options)
     MC=mcmc_engine(options)
-    return
+    #print fitparams
+    #return
     lcdata=read_lc(options)
+    return
+    fitparams.check_init(lcdata)
     MC.run_mcmc(fitparams,lcdata)
-
 if __name__=='__main__':
     main()
