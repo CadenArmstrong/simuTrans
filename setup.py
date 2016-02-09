@@ -7,9 +7,9 @@ from distutils.extension import Extension
 import numpy
 
 numpy_include = numpy.get_include()
-_transitmodel = Extension("_transitmodel",
-        ["transitmodel_wrap.cxx",
-            "transitmodel.cpp"],
+_simplemodel = Extension("_simplemodel",
+        ["simplemodel_wrap.cxx",
+            "simplemodel.cpp"],
         include_dirs = [numpy_include],
         )
 
@@ -17,6 +17,6 @@ setup(name="Simutrans",
         author_email = "",
         url = "",
         version = "0.0.0",
-        py_modules = ["transitmodel"],
-        ext_modules = [_transitmodel])
+        py_modules = ["simplemodel"],
+        ext_modules = [_simplemodel])
 
