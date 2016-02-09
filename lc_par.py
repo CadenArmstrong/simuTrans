@@ -2,8 +2,8 @@
 import os
 import sys
 import numpy as np
-import matplotlib
-from matplotlib import pyplot as plt
+#import matplotlib
+#from matplotlib import pyplot as plt
 class lightcurve(object):
 
     def __init__(self,jd,mag,description="",cadence=0.02044):
@@ -27,16 +27,16 @@ def read_lc(options):
     if not options.lc.inpath=="":
         if not os.path.exists(options.lc.inpath):
             raise IOError, "the input path for light curve file %s does not exist."
-    if not infile=="":
-        if not os.path.exists(options.lc.inpath+options.lc.infile):
+    if not options.lc.infile=="":
+        if not os.path.exists(options.lc.inpath+'/'+options.lc.infile):
             raise IOError, "the light curve file %s does not exist."
 
         #tobedone, how to figure out the cadence
         #let's go with whitespace lcs first
-        jd,mag=np.loadtxt(options.lc.inpath+options.lc.infile,usecols=(options.lc.coljd,options.lc.colmag),unpack=True)
-        lcdata= [lightcurve(jd,mag,options.lc.inpath+options.lc.infile,options.lc.cadence)]
+        jd,mag=np.loadtxt(options.lc.inpath+'/'+options.lc.infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
+        lcdata= [lightcurve(jd,mag,options.lc.inpath+'/'+options.lc.infile,options.lc.cadence)]
     else:
-        if not os.path.exists(options.lc.inpath+options.lc.inlist):
+        if not os.path.exists(options.lc.inpath+'/'+options.lc.inlist):
             raise IOError, "the light curve list %s does not exist."
         lcdata=[]
         #assuming the inlist only gives the file name, and files are under inpath
@@ -47,7 +47,7 @@ def read_lc(options):
             if not os.path.exists(infile):
                 raise IOError, "the light curve file %s does not exist."
 
-            jd,mag=np.loadtxt(infile,usecols=(options.lc.coljd,options.lc.colmag),unpack=True)
+            jd,mag=np.loadtxt(infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
             lcdata.append(lightcurve(jd,mag,infile,cadence))
     return lcdata
 
