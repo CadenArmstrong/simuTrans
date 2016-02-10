@@ -71,9 +71,10 @@ class Params():
         self.transitmodel.SetupStar(np.array([self.paradic['star_gridsize'],self.paradic['u1'],self.paradic['u2'],self.paradic['gd_beta'],self.paradic['star_f']]))
         self.transitmodel.SetupPlanet(np.array([self.paradic['planet_gridsize'],self.paradic['b'],self.paradic['Rratio'],1./self.paradic['sma'],self.paradic['planet_f'],self.paradic['e']]))
         phase=self.cal_phase(cadence)
+        #phase=np.arcsin((np.arange(50)-25.)/25.*0.75/5000.)
         print phase
         model_lc=np.zeros(len(phase))
-        print type(phase),type(model_lc)
+        #print type(phase),type(model_lc)
         self.transitmodel.RelativeFlux(phase,model_lc)
         return model_lc
 
@@ -81,11 +82,12 @@ class Params():
         #calculate the phase of the planet orbit from the cadence
         period=self.paradic['P']
         epoch=self.paradic['T0']
-        phase=(cadence-epoch)-np.round(cadence-epoch)
+        phase=np.pi*((cadence-epoch)/period-np.round((cadence-epoch)/period))
         return phase 
 
     def check_init(self,lcdata):
         model_lc=self.model(lcdata[0].jd)
+        #phase=np.arcsin((np.arange(50)-25.)/25.*0.75/5000.)
         for i in xrange(len(lcdata[0].jd)):
             print lcdata[0].jd[i],model_lc[i]
         #plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
