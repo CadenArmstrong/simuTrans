@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import scipy as sp
 import numpy as np
 import cfg_parse as cfg
