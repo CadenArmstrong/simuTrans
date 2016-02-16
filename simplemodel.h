@@ -34,16 +34,16 @@
 using namespace std;
 class SimpleModel{
 	public:
-		SimpleModel();
-		~SimpleModel();
+		SimpleModel(){};
+		~SimpleModel(){};
 		void SetupStar(double *star_params, int np){
 			this->star_grid_size = (int)star_params[KEY_SS_GRID_SIZE];
-			this->star_pixel_size = 1.0;
 			if(this->star_grid_size % 2 == 0){
 		//		printf("Even sized grid detected, moving to odd size\n");
 				this->star_grid_size += 1;
 			}
 			this->star_grid_size_half = (this->star_grid_size-1)/2;
+			this->star_pixel_size = 1.0/(this->star_grid_size*this->star_grid_size);
 			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
 
 			float mu = 0;
@@ -74,7 +74,7 @@ class SimpleModel{
 			this->planet_oppacity_map = (double*)calloc((this->planet_grid_size*this->planet_grid_size),sizeof(double));
 			this->planet_grid_size_half = (this->planet_grid_size-1)/2;
 			this->rp_rs = planet_params[KEY_PS_RPRS];
-			this->planet_pixel_size = this->rp_rs*this->rp_rs;
+			this->planet_pixel_size = this->rp_rs*this->rp_rs/(this->planet_grid_size*this->planet_grid_size);
 			this->semi_major = planet_params[KEY_PS_SEMI_MAJOR_AXIS];
 			this->impact_parameter = planet_params[KEY_PS_IMPACT];
 			this->obliquity = planet_params[KEY_PS_OBLIQUITY];
@@ -95,7 +95,7 @@ class SimpleModel{
 		//	printf("Starting integration\n");
 			double planet_position_x = 0;
 			double planet_position_y = 0;
-			double current_flux = 0;
+			long double current_flux = 0;
 			for(int a=0; a<np;a++){
 				current_flux = 0;
 				planet_position_x = this->semi_major*sin(phase[a]);
@@ -105,7 +105,7 @@ class SimpleModel{
 						int star_x = (((x-this->planet_grid_size_half)/this->planet_grid_size)*this->rp_rs+planet_position_x)*1.5*this->star_grid_size;
 						int star_y = (((y-this->planet_grid_size_half)/this->planet_grid_size)*this->rp_rs+planet_position_y)*1.5*this->star_grid_size;
 						if(star_x >= 0 && star_x < this->star_grid_size && star_y >= 0 && star_y < this->star_grid_size){
-							current_flux += this->planet_pixel_size*this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y];
+							current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
 						}
 					}
 				}
