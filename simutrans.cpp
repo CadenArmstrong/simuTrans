@@ -1,5 +1,4 @@
-#include "transitmodel.h"
-#include "simplemodel.cpp"
+#include "simplemodel.h"
 
 int main(int argc, char *argv[]){
 	double star_params[] = {5000,0.5,0.2,0.1,0.95}; // grid size, limb1, limb2, grav1 (unused), flattening (unused)

@@ -1,8 +1,5 @@
-#OBJECT = .o main.o
-#PROJECT = oblateness
-#OBJECT_DEBUG = oblatenessfast.o testinter.o
-#PROJECT_DEBUG = testinter
-#TRANSITMODEL_SOURCES = transitmodel.h
+OBJECT = simplemodel.o simutrans.o 
+PROJECT = simutranscc
 SIMPLEMODEL_SOURCES = simplemodel.h
 #TRANSITMODEL_INTERFACE = transitmodel.i
 SIMPLEMODEL_INTERFACE = simplemodel.i
@@ -19,11 +16,11 @@ all: $(WRAPPERS) $(SOURCES)
 	swig -c++ -python $<
 
 
-#.PHONY: cc
-#cc: $(PROJECT)
-#
-#$(PROJECT) :$(OBJECT)
-#	$(CXX) -pg -o $@ $^
+.PHONY: cc
+cc: $(PROJECT)
+
+$(PROJECT) :$(OBJECT)
+	$(CXX) -pg -o $@ $^
 
 #.PHONY: test
 #test: $(PROJECT_DEBUG)

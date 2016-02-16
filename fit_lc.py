@@ -125,6 +125,10 @@ def main():
     lcdata=read_lc(options)
     #lcdata[0].plot()
     fitparams.check_init(lcdata)
+    print "before del"
+    del fitparams.transitmodel
+    print "after del"
+    #print "end of check_init"
     return
     MC.run_mcmc(fitparams,lcdata)
 if __name__=='__main__':

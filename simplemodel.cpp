@@ -1,28 +1,4 @@
-#include "transitmodel.h"
-
-class SimpleModel: public TransitModel{
-	public:
-		SimpleModel();
-		~SimpleModel();
-		void SetupStar(double *star_params, int np);
-		void SetupPlanet(double *planet_params, int np);
-		void RelativeFlux(double *phase, int np, double* flux_out, int npo);
-	private:
-		double *star_flux_map;
-		double *planet_oppacity_map;
-		double star_total_flux;
-		double rp_rs; // Radius of planet over radius of star
-		double star_pixel_size;
-		double planet_pixel_size;
-		double semi_major;
-		double impact_parameter;
-		double obliquity;
-		int star_grid_size;
-		int star_grid_size_half;
-		int planet_grid_size;
-		int planet_grid_size_half;
-
-};
+#include "simplemodel.h"
 
 SimpleModel::SimpleModel(void){}
 SimpleModel::~SimpleModel(){};
