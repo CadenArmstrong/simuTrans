@@ -1,21 +1,21 @@
-#include "transitmodel.h"
-#include "simplemodel.cpp"
+#include "simplemodel.h"
 
 int main(int argc, char *argv[]){
-	double star_params[] = {5000,0.5,0.2,0.1,0.95}; // grid size, limb1, limb2, grav1 (unused), flattening (unused)
+	double star_params[] = {5000,0.3,0.3,2.1,0.95}; // grid size, limb1, limb2, grav1 (unused), flattening (unused)
 	double planet_params[] = {200,0.1,0.15,500.0,0.05}; // grid size, impact, rprs, semimajor, obliquity
-	double phase[50];
-	for(int a = 0; a < 50; a++){
-		phase[a] = asin(((a-25.0)/25.0)*0.75/500.0);
+	int phase_points = 100;
+	double phase[phase_points];
+	for(int a = 0; a < phase_points; a++){
+		phase[a] = asin(((a-(phase_points/2.0))/(phase_points/2.0))/500.0);
 	}
 	SimpleModel model;
 	model.SetupStar(star_params,5);
 	model.SetupPlanet(planet_params,5);
 
-	double *flux_out = (double*)calloc(50,sizeof(double));
-	model.RelativeFlux(phase,50,flux_out,50);
+	double *flux_out = (double*)calloc(phase_points,sizeof(double));
+	model.RelativeFlux(phase,phase_points,flux_out,phase_points);
 	printf("FLUX OUTPUT ======\n");
-	for(int a=0;a<50;a++){
+	for(int a=0;a<phase_points;a++){
 		printf("%i %.9f\n",a,flux_out[a]);
 	}
 	free(flux_out);
