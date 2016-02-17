@@ -47,7 +47,7 @@ class Params():
         #if 'b' not in self.paradic:
         #    self.paradic['b']=self.paradic[]
         if 'star_gridsize' not in self.paradic:
-            self.paradic['star_gridsize']=5000
+            self.paradic['star_gridsize']=1000
         if 'planet_gridsize' not in self.paradic:
             self.paradic['planet_gridsize']=200
         if 'gd_beta' not in self.paradic:

@@ -19,7 +19,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 					mu = sqrt(pow(x-this->star_grid_size_half,2)+ pow(y-this->star_grid_size_half,2))/star_grid_size_half;
 					// QUADRATIC LIMB DARKENING LAW
 					if(mu <= 1.0){
-						this->star_flux_map[x+y*this->star_grid_size] =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(mu))-(star_params[KEY_SS_LIMB_DARKENING_2]*mu*mu);
+						this->star_flux_map[x+y*this->star_grid_size] =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{
 						this->star_flux_map[x+y*this->star_grid_size] =  0;
