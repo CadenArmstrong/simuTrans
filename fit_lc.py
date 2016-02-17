@@ -83,7 +83,8 @@ class Params():
         #calculate the phase of the planet orbit from the cadence
         period=self.paradic['P']
         epoch=self.paradic['T0']
-        phase=np.pi*((cadence-epoch)/period-np.round((cadence-epoch)/period))
+#phase=np.pi*((cadence-epoch)/period-np.round((cadence-epoch)/period))
+        phase=np.pi*2.*((cadence-epoch)/period-np.round((cadence-epoch)/period))
         return phase 
 
     def check_init(self,lcdata):
