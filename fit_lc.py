@@ -73,7 +73,7 @@ class Params():
         self.transitmodel.SetupPlanet(np.array([self.paradic['planet_gridsize'],self.paradic['b'],self.paradic['Rratio'],1./self.paradic['sma'],self.paradic['planet_f'],self.paradic['e']]))
         phase=self.cal_phase(cadence)
         #phase=np.arcsin((np.arange(50)-25.)/25.*0.75/5000.)
-        print phase
+        #print phase
         model_lc=np.zeros(len(phase))
         #print type(phase),type(model_lc)
         self.transitmodel.RelativeFlux(phase,model_lc)
