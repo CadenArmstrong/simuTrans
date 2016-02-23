@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+import numpy as np
+from numpy import random
+import parameter
+import emcee
 class mcmc_engine():
     def __init__(self,options):
         self.nwalkers=options.mcmc.nwalkers
@@ -15,10 +20,10 @@ class mcmc_engine():
         for i in range(self.nwalkers):
             pi = []
             for j in range(len(free_params)):
-                print free_params[j]
-                pi_i = random.normal(free_params[j].var,0.01*(free_params[j].upper-free_params[j].lower))
+                #print free_params[j]
+                pi_i = random.normal(free_params[j].val,0.01*(free_params[j].upper-free_params[j].lower))
                 while pi_i > free_params[j].upper or pi_i < free_params[j].lower:
-                    pi_i = random.normal(free_params[j].var,0.01*(free_params[j].upper-free_params[j].lower))
+                    pi_i = random.normal(free_params[j].val,0.01*(free_params[j].upper-free_params[j].lower))
 
             
                 pi.append(pi_i)
@@ -26,7 +31,7 @@ class mcmc_engine():
 
         #burn
 
-        sampler = emcee.EnsembleSampler(self.nwalkers, self.ndim, fitparams.lc_chisq, args=[lcdata],threads=nthreads)
+        sampler = emcee.EnsembleSampler(self.nwalkers, ndim, fitparams.lc_chisq, args=[lcdata],threads=self.nthreads)
 
         pos, prob, state = sampler.run_mcmc(p0, self.nburn)
 
@@ -34,18 +39,18 @@ class mcmc_engine():
         #real iteration
         sampler.reset()
     
-        master_pos = []
-
-        for result in sampler.sample(pos, iterations=self.nmcmc, storechain=False):
+        #master_pos = []
+        f=open(self.output,"w")
+        f.close()
+        for result in sampler.sample(pos, iterations=self.niter, storechain=False):
             position,probability = result[0],result[1]
-
-            for i in range(len(position)):
-                if functions.isnan(probability[i]):
-                    master_pos.append(list(position[i])+[probability[i]])
-
+            f=open(self.output,"a")
+            for i in range(position.shape[0]):
+                if np.isnan(probability[i]):
+                    continue
+                f.write("{0:4d} {1:s} {1:s}\n".format(i," ".join(str(position[i])),probability[i]))
+            f.close()
         print "iteration finished"
-        master_pos = np.array(master_pos)
-        np.savetxt(self.output,master_pos,fmt="%.10f")
 
 
 

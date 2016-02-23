@@ -86,17 +86,26 @@ def fitlc_parse(options):
     setattr(options.mcmc,'output',p.get('Section MCMC',"output"))
 
     #parse parameter options
-    fixparams=p.get('Section FixedParameters','fixparams').split(',')
-    for i in xrange(len(fixparams)):
-        options.params.append(parameter(float(p.get('Section FixedParameters',fixparams[i])),0,0,fixparams[i],0))
-
     freeparams=p.get('Section FreeParameters','freeparams').split(',')
     for i in xrange(len(freeparams)):
         try:
-            val,upper,lower=p.get('Section FreeParameters',freeparams[i]).split(',')
+            freeargs=p.get('Section FreeParameters',freeparams[i]).split(',')
+            if len(freeargs)==3:
+                val,upper,lower=freeargs
+                options.params.append(parameter(float(val),float(upper),float(lower),freeparams[i],fitflag=1))
+            elif len(freeargs)==5:
+                val,upper,lower,xmin,xmax=freeargs
+                options.params.append(parameter(float(val),float(upper),float(lower),freeparams[i],fitflag=1,xmin=xmin,xmax=xmax))
+            else:
+                raise ValueError
         except ValueError:
-            raise 'Free Parameters need to be given as val,upper,lower format in configure file'
-        options.params.append(parameter(float(val),float(upper),float(lower),freeparams[i],1))
+            raise 'Free Parameters need to be given as val,upper,lower (,xmin,xmax) format in configure file'
+
+    fixparams=p.get('Section FixedParameters','fixparams').split(',')
+    for i in xrange(len(fixparams)):
+        options.params.append(parameter(float(p.get('Section FixedParameters',fixparams[i])),0,0,fixparams[i],fitflag=0))
+
+
     return
 
 

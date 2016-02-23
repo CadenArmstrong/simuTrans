@@ -6,11 +6,15 @@ import numpy as np
 #from matplotlib import pyplot as plt
 class lightcurve(object):
 
-    def __init__(self,jd,mag,description="",cadence=0.02044):
+    def __init__(self,jd,mag,err=None,description="",cadence=0.02044):
         self.jd=jd
         self.mag=mag
         self.description=description
         self.cadence=cadence
+        if err is None:
+            self.err=np.zeros(len(jd))+1
+        else:
+            self.err=err
         return
 
     def plot(self,tofile=False):
@@ -34,7 +38,7 @@ def read_lc(options):
         #tobedone, how to figure out the cadence
         #let's go with whitespace lcs first
         jd,mag=np.loadtxt(options.lc.inpath+'/'+options.lc.infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
-        lcdata= [lightcurve(jd,mag,options.lc.inpath+'/'+options.lc.infile,options.lc.cadence)]
+        lcdata= [lightcurve(jd,mag,description=options.lc.inpath+'/'+options.lc.infile,cadence=options.lc.cadence)]
     else:
         if not os.path.exists(options.lc.inpath+'/'+options.lc.inlist):
             raise IOError, "the light curve list %s does not exist."
@@ -48,6 +52,6 @@ def read_lc(options):
                 raise IOError, "the light curve file %s does not exist."
 
             jd,mag=np.loadtxt(infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
-            lcdata.append(lightcurve(jd,mag,infile,cadence))
+            lcdata.append(lightcurve(jd,mag,description=infile,cadence=cadence))
     return lcdata
 
