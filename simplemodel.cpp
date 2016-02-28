@@ -11,22 +11,26 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			this->star_grid_size_half = (this->star_grid_size-1)/2;
 			this->star_pixel_size = 1.0/(this->star_grid_size_half*this->star_grid_size_half);
 			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
-
+			this->star_flattening = star_params[KEY_SS_FLATTENING];
 			float mu = 0;
+			double theta = 0;
+			float r_b = 1.0-this->star_flattening;
 			long double total_flux = 0;
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
 					mu = sqrt(pow(x-this->star_grid_size_half,2)+ pow(y-this->star_grid_size_half,2))/star_grid_size_half;
+					mu = mu / (r_b/sqrt(pow(r_b*cos(theta),2)+pow(sin(theta),2)));
 					// QUADRATIC LIMB DARKENING LAW
-					if(mu <= 1.0){
+					theta = atan2(y-this->star_grid_size_half, x-this->star_grid_size_half);
+					if(mu <= 1.0 ){
 						this->star_flux_map[x+y*this->star_grid_size] =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{
 						this->star_flux_map[x+y*this->star_grid_size] =  0;
 					}
-					//printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
+					printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
 				}
-		//		printf("\n");
+				printf("\n");
 			}
 			this->star_total_flux = (double)total_flux;
 			printf("Star setup complete\n");
@@ -44,10 +48,16 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 			this->semi_major = planet_params[KEY_PS_SEMI_MAJOR_AXIS];
 			this->impact_parameter = planet_params[KEY_PS_IMPACT];
 			this->obliquity = planet_params[KEY_PS_OBLIQUITY];
+			this->planet_flattening = planet_params[KEY_PS_FLATTENING];
 			double mu;
+			double theta = 0;
+			float r_b = 1.0-this->planet_flattening;
 			for(int x=0;x<this->planet_grid_size;x++){
 				for(int y = 0;y<this->planet_grid_size;y++){
 					mu = sqrt(pow(x-this->planet_grid_size_half,2) + pow(y-this->planet_grid_size_half,2))/planet_grid_size_half;
+					mu = mu / (r_b/sqrt(pow(r_b*cos(theta),2)+pow(sin(theta),2)));
+					// QUADRATIC LIMB DARKENING LAW
+					theta = atan2(y-this->planet_grid_size_half, x-this->planet_grid_size_half);
 					if(mu <= 1.0){
 						this->planet_oppacity_map[x+y*this->planet_grid_size] =  1.0;
 					}else{
