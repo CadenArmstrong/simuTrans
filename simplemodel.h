@@ -28,6 +28,7 @@
 #define KEY_PS_SEMI_MAJOR_AXIS 3 // Planet setup -- semi major axis in R star
 #define KEY_PS_OBLIQUITY 4 // Planet setup -- obliquity
 #define KEY_PS_ECCENTRICITY 5 // Planet setup -- eccentricity
+#define KEY_PS_FLATTENING 6
 // **********************
 
 
@@ -49,6 +50,8 @@ class SimpleModel{
 		double semi_major;
 		double impact_parameter;
 		double obliquity;
+		double planet_flattening;
+		double star_flattening;
 		int star_grid_size;
 		int star_grid_size_half;
 		int planet_grid_size;
