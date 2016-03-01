@@ -11,9 +11,9 @@ import emcee
 from parameter import parameter
 from Emceewrapper import mcmc_engine
 from simplemodel import SimpleModel as tmodel 
-import matplotlib 
-from matplotlib import pyplot as plt
-
+#import matplotlib 
+#from matplotlib import pyplot as plt
+import time
 class Params():
     def __init__(self,options):
         self.paramarr=options.params
@@ -116,9 +116,9 @@ class Params():
             model_lc=self.model(lcdata[0].jd)
             #for l in xrange(len(lcdata[0].jd)):
             #    print lcdata[0].jd[i],model_lc[i]
-            plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
-            plt.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
-            plt.show()
+            #plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
+            #plt.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+            #plt.show()
         return
 
     def update(self):
@@ -172,12 +172,14 @@ def main():
     #return
     lcdata=read_lc(options)
     #lcdata[0].plot()
-    #fitparams.check_init(lcdata)
+    starttime=time.time()
+    fitparams.check_init(lcdata)
+    print time.time()-starttime
     #print "before del"
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    #return
+    return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
