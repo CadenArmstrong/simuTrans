@@ -11,8 +11,6 @@ import emcee
 from parameter import parameter
 from Emceewrapper import mcmc_engine
 from simplemodel import SimpleModel as tmodel 
-#import matplotlib 
-#from matplotlib import pyplot as plt
 import time
 class Params():
     def __init__(self,options):
@@ -31,13 +29,12 @@ class Params():
             if self.paramarr[i].name=='q1':
                 self.qflag=True
         self.paradic=dict(zip(keyarr,vararr))
+        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0} 
         self.checkparam()
-        
         return
     def __str__(self):
         string=""
         for key,value in self.paradic.iteritems():
-            #print key,value
             string+="%s:%f\n" % (key,self.paramarr[int(value)].val)
         return string
 
@@ -49,35 +46,29 @@ class Params():
         #check and fill in all the default parameters
 
         #need to modify the value depend on q1 and q2
-        if 'u1' not in self.paradic:
-            self.paramarr.append(self.readpara('q1'))
-            self.paramarr[-1].name='u1'
-            self.paradic['u1']=len(self.paramarr)-1 
-        if 'u2' not in self.paradic:
-            self.paramarr.append(self.readpara('q2'))
-            self.paramarr[-1].name='u2'
-            self.paradic['u2']=len(self.paramarr)-1 
-        #if 'b' not in self.paradic:
-        #    self.paradic['b']=self.paradic[]
-        if 'star_gridsize' not in self.paradic:
-            self.paramarr.append(parameter(1000,0,0,'star_gridsize'))
-            self.paradic['star_gridsize']=len(self.paramarr)-1
-        if 'planet_gridsize' not in self.paradic:
-            self.paramarr.append(parameter(200,0,0,'planet_gridsize'))
-            self.paradic['planet_gridsize']=len(self.paramarr)-1
-        if 'gd_beta' not in self.paradic:
-            self.paramarr.append(parameter(0,0,0,'gd_beta'))
-            self.paradic['gd_beta']=len(self.paramarr)-1
-        if 'star_f' not in self.paradic:
-            self.paramarr.append(parameter(0,0,0,'star_f'))
-            self.paradic['star_f']=len(self.paramarr)-1
-        if 'planet_f' not in self.paradic:
-            self.paramarr.append(parameter(0,0,0,'planet_f'))
-            self.paradic['planet_f']=len(self.paramarr)-1
-        if 'e' not in self.paradic:
-            self.paramarr.append(parameter(0,0,0,'e'))
-            self.paradic['e']=len(self.paramarr)-1
+        if 'u1' not in self.paradic or 'u2' not in self.paradic:
+            if 'q1' not in self.paradic or 'q2' not in self.paradic:
+
+                self.paramarr.append(parameter(self.requiredpara['u1'],0.,0.,'u1'))
+                self.paradic['u1']=len(self.paramarr)-1
+                self.paramarr.append(parameter(self.requiredpara['u2'],0.,0.,'u2'))
+                self.paradic['u2']=len(self.paramarr)-1
+            else:
+                u1,u2=self.cal_LD(self.readpara('q1').val,self.readpara('q2').val)
+                self.paramarr.append(parameter(u1,0.,0.,'u1'))
+                self.paradic['u1']=len(self.paramarr)-1 
+                self.paramarr.append(parameter(u2,0.,0.,'u2'))
+                self.paradic['u2']=len(self.paramarr)-1 
+        for key,value in self.requiredpara.iteritems():
+            if key not in self.paradic:
+                self.paramarr.append(parameter(value,0.,0.,key))
+                self.paradic[key]=len(self.paramarr)-1
         return
+
+    def cal_LD(self,q1,q2):
+        u1=q1
+        u2=q2
+        return [u1,u2]
 
     def get_freeparams(self):
         return self.paramarr[:self.lenfree]
@@ -89,8 +80,9 @@ class Params():
         #    if self.paramarr[i].name=='q1':
         #        qflag=True
         if self.qflag:
-            self.readpara('u1').val=self.readpara('q1').val
-            self.readpara('u2').val=self.readpara('q2').val
+            u1,u2=self.cal_LD(self.readpara('q1').val,self.readpara('q2').val)
+            self.readpara('u1').val=u1
+            self.readpara('u2').val=u2
         return 
 
     def model(self,cadence):
@@ -116,15 +108,19 @@ class Params():
             model_lc=self.model(lcdata[0].jd)
             #for l in xrange(len(lcdata[0].jd)):
             #    print lcdata[0].jd[i],model_lc[i]
-            #plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
-            #plt.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
-            #plt.show()
+            try:
+                plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
+                plt.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+                plt.show()
+            except NameError:
+                #raise
+                continue
         return
 
     def update(self):
 
         self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('gd_beta').val,self.readpara('star_f').val]))
-        self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,self.readpara('b').val,self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('planet_f').val,self.readpara('e').val]))
+        self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,self.readpara('b').val,self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
     def checkbound(self):
@@ -164,6 +160,10 @@ class Params():
 
 def main():
     options=cmd.fitlc_parse()
+    if options.plot:
+        import matplotlib 
+        from matplotlib import pyplot as plt
+        global plt
     cfg.fitlc_parse(options)
     #print options
     fitparams=Params(options)
