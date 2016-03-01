@@ -74,20 +74,29 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 			double planet_position_x = 0;
 			double planet_position_y = 0;
 			long double current_flux = 0;
+			int star_x = 0;
+			int star_y = 0;
 			for(int a=0; a<np;a++){
 				current_flux = 0;
 				planet_position_x = this->semi_major*sin(phase[a]);
 				planet_position_y = this->impact_parameter + tan(this->obliquity)*planet_position_x;
-				for(int x=0;x<this->planet_grid_size;x++){
-					for(int y=0;y<this->planet_grid_size;y++){
-						int star_x = (((x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
-						int star_y = (((y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
-						if(star_x >= 0 && star_x < this->star_grid_size && star_y >= 0 && star_y < this->star_grid_size){
-							current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
+				if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < 1.0 + this->rp_rs){
+//					printf("%i in\n",a);
+					for(int x=0;x<this->planet_grid_size;x++){
+						star_x = (((x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
+						for(int y=0;y<this->planet_grid_size;y++){
+							star_y = (((y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
+							if(star_x >= 0 && star_x < this->star_grid_size && star_y >= 0 && star_y < this->star_grid_size){
+								current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
+							}
 						}
 					}
+
+					flux_out[a] = (this->star_total_flux - current_flux)/this->star_total_flux;
+				}else{
+//					printf("%i out\n",a);
+					flux_out[a] = 1.0;
 				}
-				flux_out[a] = (this->star_total_flux - current_flux)/this->star_total_flux;
 			}
 		printf("Flux integration complete\n");
 		};
