@@ -55,7 +55,7 @@ class Params():
                 self.paramarr.append(parameter(self.requiredpara['u2'],0.,0.,'u2'))
                 self.paradic['u2']=len(self.paramarr)-1
             else:
-                u1,u2=self.cal_LD(self.readpara('q1').val,self.readpara('q2').val)
+                u1,u2=self.cal_LD_qtou(self.readpara('q1').val,self.readpara('q2').val)
                 self.paramarr.append(parameter(u1,0.,0.,'u1'))
                 self.paradic['u1']=len(self.paramarr)-1 
                 self.paramarr.append(parameter(u2,0.,0.,'u2'))
@@ -80,9 +80,10 @@ class Params():
                 self.paradic[key]=len(self.paramarr)-1
         return
 
-    def cal_LD(self,q1,q2):
-        u1=q1
-        u2=q2
+    def cal_LD_qtou(self,q1,q2):
+        #kipping 2013, eq 15,16
+        u1=2.*np.sqrt(q1)*q2
+        u2=np.sqrt(q1)*(1-2*q2)
         return [u1,u2]
 
     def get_freeparams(self):
@@ -95,7 +96,7 @@ class Params():
         #    if self.paramarr[i].name=='q1':
         #        qflag=True
         if self.qflag:
-            u1,u2=self.cal_LD(self.readpara('q1').val,self.readpara('q2').val)
+            u1,u2=self.cal_LD_qtou(self.readpara('q1').val,self.readpara('q2').val)
             self.readpara('u1').val=u1
             self.readpara('u2').val=u2
         return 
