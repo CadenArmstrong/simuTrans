@@ -12,6 +12,7 @@ from parameter import parameter
 from Emceewrapper import mcmc_engine
 from simplemodel import SimpleModel as tmodel 
 import time
+import copy
 class Params():
     def __init__(self,options):
         self.paramarr=options.params
@@ -29,13 +30,13 @@ class Params():
             if self.paramarr[i].name=='q1':
                 self.qflag=True
         self.paradic=dict(zip(keyarr,vararr))
-        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0} 
+        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
         return
     def __str__(self):
         string=""
         for key,value in self.paradic.iteritems():
-            string+="%s:%f\n" % (key,self.paramarr[int(value)].val)
+            string+="%s\n" % (self.paramarr[int(value)])
         return string
 
     def readpara(self,name):
@@ -58,7 +59,21 @@ class Params():
                 self.paramarr.append(parameter(u1,0.,0.,'u1'))
                 self.paradic['u1']=len(self.paramarr)-1 
                 self.paramarr.append(parameter(u2,0.,0.,'u2'))
-                self.paradic['u2']=len(self.paramarr)-1 
+                self.paradic['u2']=len(self.paramarr)-1
+        if 'b2' not in self.paradic:
+            if 'b' not in self.paradic:
+                self.paramarr.append(parameter(self.requiredpara['b'],0.,0.,'b'))
+                self.paramarr.append(parameter(self.requiredpara['b2'],0.,0.,'b2'))
+            else:
+                para_b=copy.deepcopy(self.readpara('b'))
+                para_b2=parameter(para_b.val**2.,para_b.upper**2.,para_b.lower**2.,'b2',fitflag=para_b.fitflag,xmin=0,xmax=1)
+                if para_b.fitflag==1:
+                    #print self.paradic['b']
+                    self.paramarr[int(self.paradic['b'])]=para_b2
+                    self.paradic['b2']=self.paradic['b']
+                    #self.paramarr.append(para_b)
+                    #self.paradic['b']=len(self.paramarr)-1
+                    #self.readpara('b').fitflag=0
         for key,value in self.requiredpara.iteritems():
             if key not in self.paradic:
                 self.paramarr.append(parameter(value,0.,0.,key))
@@ -120,7 +135,7 @@ class Params():
     def update(self):
 
         self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('gd_beta').val,self.readpara('star_f').val]))
-        self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,self.readpara('b').val,self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
+        self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
     def checkbound(self):
@@ -168,7 +183,7 @@ def main():
     #print options
     fitparams=Params(options)
     MC=mcmc_engine(options)
-    #print fitparams
+    print fitparams
     #return
     lcdata=read_lc(options)
     #lcdata[0].plot()
