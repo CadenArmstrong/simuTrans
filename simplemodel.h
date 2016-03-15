@@ -6,7 +6,6 @@
 #include<time.h>
 #include<gsl/gsl_sf_ellint.h>
 #define pi 3.1415926535897932384626433832795028841971693993751
-#define GRAV_CONSTANT 1.0 // UUUHHHHH needs to be changed...TODO
 
 // SetupStar input parameter keys
 // **********************
