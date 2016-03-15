@@ -139,7 +139,7 @@ class Params():
 
     def update(self):
 
-        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,self.readpara('Mstar').val,1./3600./self.readpara('Prot').val,self.readpara('gpole').val,self.readpara('gd_beta').val]))
+        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,self.readpara('Mstar').val*3.94338e-7,1./3600./self.readpara('Prot').val,self.readpara('gpole').val,self.readpara('gd_beta').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
