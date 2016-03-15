@@ -22,10 +22,9 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			double BB; // Black body function
 			double GEFF;
 			double vec[2];
-			double groteq = pow(star_params[KEY_SS_OMEGA],2)*pow(1.0,3)*pow((1-this->star_flattening),2)/(GRAV_CONSTANT*star_params[KEY_SS_STELLAR_MASS]);
 			double ggraveq = pow((1.0-this->star_flattening),2);
 
-			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,groteq);
+			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,star_params[KEY_SS_GROTEQ]);
 
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
@@ -38,7 +37,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
 						GEFF = zeipel.Calgeff(vec,2);
-						BB = pow(GEFF/star_params[KEY_SS_G_POLE],4*star_params[KEY_SS_G_DARK]);
+						BB = pow(GEFF,4*star_params[KEY_SS_G_DARK]);
 						LD =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
 						this->star_flux_map[x+y*this->star_grid_size] = LD*BB;
 						//this->star_flux_map[x+y*this->star_grid_size] = BB;

@@ -17,10 +17,8 @@
 #define KEY_SS_LIMB_DARKENING_2 2 // Star setup -- stellar limb darkening 2
 #define KEY_SS_FLATTENING 3 // Star setup -- stellar flattening
 #define KEY_SS_OBLIQUITY 4 // the angle between the stellar spin with the sky plane
-#define KEY_SS_STELLAR_MASS 5 // 
-#define KEY_SS_OMEGA 6// rotational rate of the star
-#define KEY_SS_G_POLE 7 // Gravity at the pole
-#define KEY_SS_G_DARK 8 // Gravity darkening parameter
+#define KEY_SS_GROTEQ 5 // Constant for rotational rate of star, gravitation constant, and stellar mass
+#define KEY_SS_G_DARK 6 // Gravity darkening parameter
 
 // **********************
 
