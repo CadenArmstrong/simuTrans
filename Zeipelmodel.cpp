@@ -57,7 +57,7 @@ double ZeipelModel::Determinant_(double x,double y){
   return d;
 }
 
-double ZeipelModel::Calzcoord_(double x, double y, double d){
+inline double ZeipelModel::Calzcoord_(double x, double y, double d){
   double za, zb;
   double f2 = (1-fratio_)*(1-fratio_);
   za = -2*y*(1-f2)*sin(phi_)*cos(phi_)+sqrt(d);
@@ -65,7 +65,7 @@ double ZeipelModel::Calzcoord_(double x, double y, double d){
   return za/zb;
 }
 
-void ZeipelModel::Rotate_(double *x, double *xnew){
+inline void ZeipelModel::Rotate_(double *x, double *xnew){
   xnew[0] = x[0];
   xnew[1] = x[1]*cos(phi_)+x[2]*sin(phi_);
   xnew[2] = -x[1]*sin(phi_) + x[2]*cos(phi_);

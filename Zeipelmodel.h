@@ -14,8 +14,17 @@ class ZeipelModel{
      * is in.
      * */
     ZeipelModel(double fratio,double phi,double Req,  double ggraveq, double groteq);
+    /* ggraveq = (Rpole / Req)**2
+       groteq = (Omega*Rpole)**2 * Req/(GM)
+       Omega is rotation rate for star
+
+       T = Tpole (g/gpole)**B -> using gs above will give in units of gpole
+       Tpole cancels somewhere, use it for flux
+
+       */
+    
     ~ZeipelModel();
-    double Calgeff(double *x, int nx);
+    inline double Calgeff(double *x, int nx);
   private:
     double Determinant_(double x,double y);
     double Calzcoord_(double x,double y,double d);

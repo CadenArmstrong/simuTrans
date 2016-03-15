@@ -1,5 +1,5 @@
 #include "simplemodel.h"
-//#include "Ziepelmodel.h"
+#include "Zeipelmodel.cpp"
 
 SimpleModel::SimpleModel(void){}
 SimpleModel::~SimpleModel(){};
@@ -13,25 +13,40 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			this->star_pixel_size = 1.0/(this->star_grid_size_half*this->star_grid_size_half);
 			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
 			this->star_flattening = star_params[KEY_SS_FLATTENING];
+			this->star_obliquity = star_params[KEY_SS_OBLIQUITY];
 			float mu = 0;
 			double theta = 0;
 			float r_b = 1.0-this->star_flattening;
 			long double total_flux = 0;
+			double LD; // Limb Darkening
+			double BB; // Black body function
+			double GEFF;
+			double vec[2];
+			double groteq = pow(star_params[KEY_SS_OMEGA],2)*pow(1.0,3)*pow((1-this->star_flattening),2)/(GRAV_CONSTANT*star_params[KEY_SS_STELLAR_MASS]);
+			double ggraveq = pow((1.0-this->star_flattening),2);
+
+			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,groteq);
+
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
 					mu = sqrt(pow(x-this->star_grid_size_half,2)+ pow(y-this->star_grid_size_half,2))/star_grid_size_half;
 					mu = mu / (1.0*r_b/sqrt(pow(r_b*cos(theta),2)+pow(1.0*sin(theta),2)));
-					// QUADRATIC LIMB DARKENING LAW
 					theta = atan2(y-this->star_grid_size_half, x-this->star_grid_size_half);
 					if(mu <= 1.0 ){
-						this->star_flux_map[x+y*this->star_grid_size] =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
+						// QUADRATIC LIMB DARKENING LAW
+						vec[0] = (x-this->star_grid_size_half)/this->star_grid_size_half;
+						vec[1] = (y-this->star_grid_size_half)/this->star_grid_size_half;
+						GEFF = zeipel.Calgeff(vec,2);
+						BB = pow(GEFF/star_params[KEY_SS_G_POLE],4*star_params[KEY_SS_G_DARK]);
+						LD =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
+						this->star_flux_map[x+y*this->star_grid_size] = LD*BB;
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{
 						this->star_flux_map[x+y*this->star_grid_size] =  0;
 					}
-//					printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
+					printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
 				}
-//				printf("\n");
+				printf("\n");
 			}
 			this->star_total_flux = (double)total_flux;
 			printf("Star setup complete\n");
