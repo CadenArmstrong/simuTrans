@@ -37,10 +37,10 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
 						GEFF = zeipel.Calgeff(vec,2);
-						BB = pow(GEFF,4*star_params[KEY_SS_G_DARK]);
+						BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
 						LD =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
-						//this->star_flux_map[x+y*this->star_grid_size] = LD*BB;
-						this->star_flux_map[x+y*this->star_grid_size] = BB;
+						this->star_flux_map[x+y*this->star_grid_size] = LD*BB;
+						//this->star_flux_map[x+y*this->star_grid_size] = BB;
 						//this->star_flux_map[x+y*this->star_grid_size] = LD;
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{

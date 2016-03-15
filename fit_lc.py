@@ -142,7 +142,7 @@ class Params():
 
     def update(self):
         #Prot in hours, Mstar in Msun, Rstar in Rsun, graivity constant G is already in the coeff
-        groteq=0.19567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
+        groteq=(2.*np.pi)**2*0.19567/self.readpara('Prot').val**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
         #groteq=1.9567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
         #print groteq
         #return
