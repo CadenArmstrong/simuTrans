@@ -24,7 +24,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			double vec[2];
 			double ggraveq = pow((1.0-this->star_flattening),2);
 
-			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,star_params[KEY_SS_GROTEQ]*pow((1-this->star_flattening),2));
+			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
 
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
@@ -99,11 +99,12 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 			double theta = 0;
 			for(int a=0; a<np;a++){
 				current_flux = 0;
+
 				planet_position_x = this->semi_major*sin(phase[a]);
-				planet_position_y = this->impact_parameter + tan(this->obliquity)*planet_position_x;
+				planet_position_y = (this->star_flattening*this->impact_parameter) + tan(this->obliquity)*planet_position_x;
+
 				theta = atan2(planet_position_y, planet_position_y);
 				if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < (1.0*r_b_s/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2))) + (this->rp_rs*(this->rp_rs*r_b_p)/sqrt(pow(this->rp_rs*r_b_p*cos(theta),2)+pow(this->rp_rs*sin(theta),2)))){
-//					printf("%i in\n",a);
 					for(int x=0;x<this->planet_grid_size;x++){
 						star_x = (((x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
 						for(int y=0;y<this->planet_grid_size;y++){
@@ -116,12 +117,11 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 
 					flux_out[a] = (this->star_total_flux - current_flux)/this->star_total_flux;
 				}else{
-//					printf("%i out\n",a);
 					flux_out[a] = 1.0;
 				}
 			}
 		printf("Flux integration complete\n");
-		};
+};
 
 
 
