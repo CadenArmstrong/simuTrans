@@ -30,7 +30,7 @@ class Params():
             if self.paramarr[i].name=='q1':
                 self.qflag=True
         self.paradic=dict(zip(keyarr,vararr))
-        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
+        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'gpole':0.0,'Mstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
         return
     def __str__(self):
@@ -125,8 +125,12 @@ class Params():
             #for l in xrange(len(lcdata[0].jd)):
             #    print lcdata[0].jd[i],model_lc[i]
             try:
-                plt.plot(lcdata[0].jd,lcdata[0].mag,'.')
-                plt.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+                fig=plt.figure()
+                ax=fig.add_subplot(111)
+                #ax.plot(lcdata[0].jd,lcdata[0].mag,'.')
+                ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+                y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+                ax.yaxis.set_major_formatter(y_formatter)
                 plt.show()
             except NameError:
                 #raise
@@ -135,7 +139,7 @@ class Params():
 
     def update(self):
 
-        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('gd_beta').val,self.readpara('star_f').val]))
+        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,self.readpara('Mstar').val,1./3600./self.readpara('Prot').val,self.readpara('gpole').val,self.readpara('gd_beta').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
@@ -179,6 +183,7 @@ def main():
     if options.plot:
         import matplotlib 
         from matplotlib import pyplot as plt
+        global matplotlib
         global plt
     cfg.fitlc_parse(options)
     #print options
