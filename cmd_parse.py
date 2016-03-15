@@ -16,9 +16,11 @@ class fitlc_parse(object):
     def __init__(self):
         p=optparse.OptionParser()
         p.add_option('--config','-c',default='example.cfg',help='the configuration file for the program')
+        p.add_option('--plot','-p',default=False,action='store_true',help='enable plotting')
         options,arguments=p.parse_args()
         #self.cfgfile="example.cfg"
         self.cfgfile=options.config
+        self.plot=options.plot
         if not os.path.exists(self.cfgfile):
             raise IOError, "configuration file %s does not exist" % self.cfgfile
         self.mcmc=lambda:None
