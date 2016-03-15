@@ -30,7 +30,7 @@ class Params():
             if self.paramarr[i].name=='q1':
                 self.qflag=True
         self.paradic=dict(zip(keyarr,vararr))
-        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'groteq':0.0,'gpole':1.0,'Mstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
+        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'Mstar':1.0,'Rstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
         return
     def __str__(self):
@@ -138,8 +138,9 @@ class Params():
         return
 
     def update(self):
-
-        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,self.readpara('Mstar').val*3.94338e-7,1./3600./self.readpara('Prot').val,self.readpara('gpole').val,self.readpara('gd_beta').val]))
+        #Prot in hours, Mstar in Msun, Rstar in Rsun, graivity constant G is already in the coeff
+        groteq=0.19567*(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.        
+        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,groteq,self.readpara('gd_beta').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
