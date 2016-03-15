@@ -35,6 +35,7 @@ double ZeipelModel::Calgeff(double *x, int nx) {
     gj = ggrave * rnew[1]/absR;
     gz = ggrave * rnew[2]/absR + grote*rnew[2]/absRper;
     g = sqrt(gi*gi+gj*gj+gz*gz);
+    //printf("d=%f,z=%f,gi=%f,gj=%f,gz=%f\n",d,z,gi,gj,gz);
     delete [] r;
     delete [] rnew;
     return g;
