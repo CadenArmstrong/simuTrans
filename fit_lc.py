@@ -139,7 +139,9 @@ class Params():
 
     def update(self):
         #Prot in hours, Mstar in Msun, Rstar in Rsun, graivity constant G is already in the coeff
-        groteq=0.19567*(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.        
+        groteq=0.19567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
+        #print groteq
+        #return
         self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,groteq,self.readpara('gd_beta').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return

@@ -24,7 +24,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			double vec[2];
 			double ggraveq = pow((1.0-this->star_flattening),2);
 
-			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,star_params[KEY_SS_GROTEQ]);
+			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,star_params[KEY_SS_GROTEQ]*pow((1-this->star_flattening),2));
 
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
