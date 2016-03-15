@@ -202,7 +202,7 @@ def main():
     #lcdata[0].plot()
     starttime=time.time()
     fitparams.check_init(lcdata)
-    print time.time()-starttime
+    print '#',time.time()-starttime
     #print "before del"
     #del fitparams.transitmodel
     #print "after del"
