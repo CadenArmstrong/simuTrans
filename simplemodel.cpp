@@ -45,10 +45,10 @@ void SimpleModel::SetupStar(double *star_params, int np){
 					}else{
 						this->star_flux_map[x+y*this->star_grid_size] =  0;
 					}
-					//printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
+					printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
 					//printf("%f ",BB);
 				}
-				//printf("\n");
+				printf("\n");
 			}
 			this->star_total_flux = (double)total_flux;
 			printf("Star setup complete\n");
