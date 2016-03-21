@@ -37,10 +37,11 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
 						GEFF = zeipel.Calgeff(vec,2);
-						BB = pow(GEFF,4*star_params[KEY_SS_G_DARK]);
+						BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
 						LD =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
 						this->star_flux_map[x+y*this->star_grid_size] = LD*BB;
 						//this->star_flux_map[x+y*this->star_grid_size] = BB;
+						//this->star_flux_map[x+y*this->star_grid_size] = LD;
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{
 						this->star_flux_map[x+y*this->star_grid_size] =  0;
@@ -51,7 +52,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 				printf("\n");
 			}
 			this->star_total_flux = (double)total_flux;
-			printf("Star setup complete\n");
+			printf("#Star setup complete\n");
 		};
 void SimpleModel::SetupPlanet(double *planet_params, int np){
 			this->planet_grid_size = (int)planet_params[KEY_PS_GRID_SIZE];
@@ -83,12 +84,12 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 					}
 				}
 			}
-			printf("Planet setup complete\n");
+			printf("#Planet setup complete\n");
 		};
 
 
 void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo){
-			printf("Starting integration\n");
+			printf("#Starting integration\n");
 			double planet_position_x = 0;
 			double planet_position_y = 0;
 			long double current_flux = 0;
@@ -101,10 +102,11 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 				current_flux = 0;
 
 				planet_position_x = this->semi_major*sin(phase[a]);
-				planet_position_y = (this->star_flattening*this->impact_parameter) + tan(this->obliquity)*planet_position_x;
-
-				theta = atan2(planet_position_y, planet_position_y);
+				planet_position_y = ((1.-this->star_flattening)*this->impact_parameter) + tan(this->obliquity)*planet_position_x;
+				theta = atan2(planet_position_y, planet_position_x);
+        //printf("%d %f %f %f\n",a,planet_position_x,planet_position_y,theta);
 				if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < (1.0*r_b_s/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2))) + (this->rp_rs*(this->rp_rs*r_b_p)/sqrt(pow(this->rp_rs*r_b_p*cos(theta),2)+pow(this->rp_rs*sin(theta),2)))){
+        //if(pow(planet_position_x,2)<1){
 					for(int x=0;x<this->planet_grid_size;x++){
 						star_x = (((x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
 						for(int y=0;y<this->planet_grid_size;y++){
@@ -120,7 +122,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 					flux_out[a] = 1.0;
 				}
 			}
-		printf("Flux integration complete\n");
+		printf("#Flux integration complete\n");
 };
 
 

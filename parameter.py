@@ -13,9 +13,9 @@ class parameter():
         return
     def __str__(self):
         if self.fitflag==0:
-            return "%s:%f" % (self.name,self.val)
+            return "#%s:%f" % (self.name,self.val)
         else:
-            return "%s:%f + %f - %f >%f <%f" % (self.name,self.val,self.upper-self.val,self.val-self.lower,self.xmin,self.xmax)
+            return "#%s:%f + %f - %f >%f <%f" % (self.name,self.val,self.upper-self.val,self.val-self.lower,self.xmin,self.xmax)
 
 
     def __call__(self):

@@ -128,7 +128,10 @@ class Params():
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
                 #ax.plot(lcdata[0].jd,lcdata[0].mag,'.')
-                ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+                #ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
+                phase=self.cal_phase(lcdata[0].jd)/2./np.pi*self.readpara('P').val*3600.*24.
+                ax.plot(phase,model_lc,'+')
+                ax.set_xlim([-8000,8000])
                 y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
                 ax.yaxis.set_major_formatter(y_formatter)
                 plt.show()
@@ -139,7 +142,10 @@ class Params():
 
     def update(self):
         #Prot in hours, Mstar in Msun, Rstar in Rsun, graivity constant G is already in the coeff
-        groteq=0.19567*(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.        
+        groteq=(2.*np.pi)**2*0.19567/self.readpara('Prot').val**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
+        #groteq=1.9567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
+        #print groteq
+        #return
         self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val,groteq,self.readpara('gd_beta').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val,self.readpara('e').val, self.readpara('planet_f').val]))
         return
@@ -196,7 +202,7 @@ def main():
     #lcdata[0].plot()
     starttime=time.time()
     fitparams.check_init(lcdata)
-    print time.time()-starttime
+    print '#',time.time()-starttime
     #print "before del"
     #del fitparams.transitmodel
     #print "after del"
