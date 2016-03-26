@@ -46,7 +46,7 @@ class SimpleModel{
 	private:
 		double *star_flux_map;
 		double *planet_oppacity_map;
-		double star_total_flux;
+		long double star_total_flux;
 		double rp_rs; // Radius of planet over radius of star
 		double star_pixel_size;
 		double planet_pixel_size;
@@ -60,6 +60,7 @@ class SimpleModel{
 		int star_grid_size_half;
 		int planet_grid_size;
 		int planet_grid_size_half;
+		double max_brightness;
 
 };
 
