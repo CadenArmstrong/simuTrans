@@ -12,7 +12,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			this->star_grid_size_half = (this->star_grid_size-1)/2;
 			this->star_pixel_size = 1.0/(this->star_grid_size_half*this->star_grid_size_half);
 			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
-			this->star_flattening = star_params[KEY_SS_FLATTENING];
+			this->star_flattening = 1.0-sqrt(pow(1.0-star_params[KEY_SS_FLATTENING],2)*pow(cos(star_params[KEY_SS_OBLIQUITY]),2) + pow(sin(star_params[KEY_SS_OBLIQUITY]),2)); // Effective flattening
 			this->star_obliquity = star_params[KEY_SS_OBLIQUITY];
 			this->max_brightness = 0.0; // IMG
 			float mu = 0;
