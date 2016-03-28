@@ -35,11 +35,15 @@ void SimpleModel::SetupStar(double *star_params, int np){
 					theta = atan2(y-this->star_grid_size_half, x-this->star_grid_size_half);
 					if(mu <= 1.0 ){
 						// QUADRATIC LIMB DARKENING LAW
+            if (star_params[KEY_SS_G_DARK]>0){
 						vec[0] = 1.0*(x-this->star_grid_size_half)/this->star_grid_size_half;
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
 						GEFF = zeipel.Calgeff(vec,2);
 						BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
+            } else{
+              BB=1.0; 
+            }
 						LD =  1.0-(star_params[KEY_SS_LIMB_DARKENING_1]*(1-sqrt(1-mu*mu)))-(star_params[KEY_SS_LIMB_DARKENING_2]*pow((1-sqrt(1-mu*mu)),2));
 						if (LD*BB > this->max_brightness){ //IMG
 							this->max_brightness = LD*BB; //IMG
@@ -49,9 +53,13 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						//this->star_flux_map[x+y*this->star_grid_size] = LD;
 						total_flux += star_flux_map[x+y*this->star_grid_size]*this->star_pixel_size;
 					}else{
-						this->star_flux_map[x+y*this->star_grid_size] =  0;
+						this->star_flux_map[x+y*this->star_grid_size] =  0.;
 					}
+<<<<<<< HEAD
 					//printf("%f ",this->star_flux_map[x+y*this->star_grid_size]);
+=======
+					//printf("%d %d %f\n",x,y,this->star_flux_map[x+y*this->star_grid_size]);
+>>>>>>> 0a46764866b9ff0b22dc39f840298282fdb4c8c5
 					//printf("%f ",BB);
 				}
 				//printf("\n");
@@ -104,6 +112,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 			double theta = 0;
 			for(int a=0; a<np;a++){
 				current_flux = 0;
+<<<<<<< HEAD
 
 				planet_position_x = this->semi_major*sin(phase[a]); // Centre of planet x
 				planet_position_y = ((1.-this->star_flattening)*this->impact_parameter) + (tan(this->obliquity)*planet_position_x); // Centre of planet y
@@ -174,14 +183,39 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 							star_y = (int)(this->star_grid_size_half*(1.0+star_space_y));
 
 //							star_y = (((y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
+=======
+        if (fabs(phase[a])>pi/2. && fabs(phase[a])<1.5*pi){
+          flux_out[a] = 1.0;
+          continue;
+        }
+				planet_position_x = this->semi_major*sin(phase[a]);
+				planet_position_y = ((1.-this->star_flattening)*this->impact_parameter) + tan(this->obliquity)*planet_position_x;
+				theta = atan2(planet_position_y, planet_position_x);
+        //printf("%d %f %f %f\n",a,planet_position_x,planet_position_y,theta);
+				if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < (1.0*r_b_s/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2))) + (this->rp_rs*(this->rp_rs*r_b_p)/sqrt(pow(this->rp_rs*r_b_p*cos(theta),2)+pow(this->rp_rs*sin(theta),2)))){
+					for(int x=0;x<this->planet_grid_size;x++){
+						star_x = ((double(x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
+						for(int y=0;y<this->planet_grid_size;y++){
+							star_y = ((double(y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
+>>>>>>> 0a46764866b9ff0b22dc39f840298282fdb4c8c5
 							if(star_x >= 0 && star_x < this->star_grid_size && star_y >= 0 && star_y < this->star_grid_size){
+              //if(planet_position_x>1.08 && planet_position_x<1.1){
+              //printf("%f %d %d %f %f\n",planet_position_x,star_x,star_y,this->planet_oppacity_map[x+y*this->planet_grid_size],this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]);
+              //if(star_x>=1000){
+              //printf("%f %d %d %f %f %f\n",planet_position_x,star_x,star_y,this->planet_oppacity_map[x+y*this->planet_grid_size],this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y],this->star_flux_map[star_x + this->star_grid_size*star_y]); 
+              //}
+
+              //} 
+
 								current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
 							}
 						}
 					}
 
 					flux_out[a] = (this->star_total_flux - current_flux)/this->star_total_flux;
+          //printf("%d 0 %f\n",a,flux_out[a]);
 				}else{
+          //printf("%d 1 1\n",a);
 					flux_out[a] = 1.0;
 				}
 			}
