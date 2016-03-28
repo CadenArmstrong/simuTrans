@@ -112,8 +112,9 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
           flux_out[a] = 1.0;
           continue;
         }
-        planet_position_x = this->semi_major*sin(phase[a]); // Centre of planet x
-				planet_position_y = ((1.-this->star_flattening)*this->impact_parameter) + (tan(this->obliquity)*planet_position_x); // Centre of planet y
+
+				planet_position_x = this->semi_major*sin(phase[a])*cos(this->obliquity); // Centre of planet x
+				planet_position_y = ((1.-this->star_flattening)*this->impact_parameter) + (sin(this->obliquity)* this->semi_major*sin(phase[a])); // Centre of planet y
 				theta = atan2(planet_position_y, planet_position_x); // Angle between planet centre and star centre
         //printf("%d %f %f %f\n",a,planet_position_x,planet_position_y,theta);
 				float d_to_p = sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)); // Distance to planet centre from star centre
@@ -121,11 +122,11 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 				float r_of_s = (1.0)*(r_b_s)/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2));// a*b/sqrt((bcost)^2 + (asint)^2)
         
 
+        //printf("%d %f %f %f %f %f\n",a,planet_position_x,planet_position_y,d_to_p,r_of_p,r_of_s);
 			  current_flux = 0;
 				if(d_to_p <= r_of_p + r_of_s){
-          //if(a%15==0){
+					//if(a%15==0){
 					if(a>890 && a<891){
-					//if(a>870 && a<920){
 						// IMG
 						FILE *image; // IMG
 						char imgname[100];// IMG
@@ -143,7 +144,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 						float star_space_y = 0;
 						int planet_grid_x = 0;
 						int planet_grid_y = 0;
-            //float tempflux;
+
 						for(i = 0;i<this->star_grid_size;i++){
 							star_space_x = (1.0*(i-this->star_grid_size_half))/(1.0*this->star_grid_size_half);
 							for(j=0;j<this->star_grid_size;j++){
@@ -160,7 +161,6 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 
 								}
 								fprintf(image, " %i %i %i ", 0, img_bit,img_bit);
-                //tempflux+=1.0*img_bit;
 								linecount +=1;
 								if(linecount == 4){
 									fprintf(image, "\n");
@@ -169,42 +169,36 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 							}
 
 						}
-            //printf("%d %f\n",a,tempflux);
 						fclose(image);
-
+          }
 					}
-        }
 
 
 
-				
 				if(d_to_p <= r_of_p + r_of_s){
         
 					for(int x=0;x<this->planet_grid_size;x++){
 						for(int y=0;y<this->planet_grid_size;y++){
+              	star_x = ((double(x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
+                	star_y = ((double(y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
 
-							float planet_space_x = (1.0*(x-this->planet_grid_size_half)/(this->star_grid_size_half));
-							float planet_space_y = (1.0*(y-this->planet_grid_size_half)/(this->star_grid_size_half));
-							float star_space_x = (planet_space_x*this->rp_rs - planet_position_x);
-							float star_space_y = (planet_space_y*this->rp_rs - planet_position_y);
-							star_x = (int)(this->star_grid_size_half*(1.0+star_space_x));
-							star_y = (int)(this->star_grid_size_half*(1.0+star_space_y));
+							//float planet_space_x = (1.0*(x-this->planet_grid_size_half)/(this->star_grid_size_half));
+							//float planet_space_y = (1.0*(y-this->planet_grid_size_half)/(this->star_grid_size_half));
+							//float star_space_x = (planet_space_x*this->rp_rs + planet_position_x);
+							//float star_space_y = (planet_space_y*this->rp_rs + planet_position_y);
+							//star_x = (int)(this->star_grid_size_half*(1.0+star_space_x));
+							//star_y = (int)(this->star_grid_size_half*(1.0+star_space_y));
 
         	
         //printf("%d %f %f %f\n",a,planet_position_x,planet_position_y,theta);
 				//if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < (1.0*r_b_s/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2))) + (this->rp_rs*(this->rp_rs*r_b_p)/sqrt(pow(this->rp_rs*r_b_p*cos(theta),2)+pow(this->rp_rs*sin(theta),2)))){
 
 							if(star_x >= 0 && star_x < this->star_grid_size && star_y >= 0 && star_y < this->star_grid_size){
-   
-								//current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
-                if (this->planet_oppacity_map[x+y*this->planet_grid_size]>0 && this->star_flux_map[star_x + this->star_grid_size*star_y]>0){
-								  //current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
-								  current_flux += this->planet_pixel_size;
+                current_flux += this->planet_oppacity_map[x+y*this->planet_grid_size]*this->star_flux_map[star_x + this->star_grid_size*star_y]*this->planet_pixel_size;
 							}
-					}
+					
         }
       }
-					//flux_out[a] = 0.99;
 					flux_out[a] = (this->star_total_flux - current_flux)/this->star_total_flux;
 				}else{
 					flux_out[a] = 1.0;
