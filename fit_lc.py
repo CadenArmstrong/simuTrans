@@ -122,8 +122,8 @@ class Params():
         self.update()
         for i in xrange(len(lcdata)):
             model_lc=self.model(lcdata[0].jd)
-            #for l in xrange(len(lcdata[0].jd)):
-            #    print lcdata[0].jd[i],model_lc[i]
+            for l in xrange(len(lcdata[0].jd)):
+                print lcdata[0].jd[i],model_lc[i]
             try:
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
