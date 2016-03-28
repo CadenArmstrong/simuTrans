@@ -127,10 +127,10 @@ class Params():
             try:
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
-                #ax.plot(lcdata[0].jd,lcdata[0].mag,'.')
-                #ax.plot(lcdata[0].jd,model_lc,'.')
+                ax.plot(lcdata[0].jd,lcdata[0].mag,'.')
+                ax.plot(lcdata[0].jd,model_lc,'.')
                 #ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag)-lcdata[0].mag,'+')
-                ax.plot(lcdata[0].jd,model_lc-1+np.median(lcdata[0].mag)-lcdata[0].mag,'+')
+                #ax.plot(lcdata[0].jd,model_lc-1+np.median(lcdata[0].mag)-lcdata[0].mag,'+')
                 #ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
                 #ax.plot(lcdata[0].jd,model_lc-1+np.median(lcdata[0].mag),'+')
                 #phase=self.cal_phase(lcdata[0].jd)
@@ -214,7 +214,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    #return
+    return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
