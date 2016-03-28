@@ -48,7 +48,12 @@ class mcmc_engine():
             for i in range(position.shape[0]):
                 if np.isnan(probability[i]):
                     continue
-                f.write("{0:4d} {1:s} {1:s}\n".format(i," ".join(str(position[i])),probability[i]))
+                #f.write("{0:4d} {1:s} {1:s}\n".format(i," ".join(str(position[i])),probability[i]))
+                f.write(str(i)) 
+                for j in xrange(len(position[i])):
+                    f.write(" %f" % position[i][j])
+                f.write(" %f\n" % probability[i])
+                #f.write("{0:4d} {1:s} \n".format(i," ".join(list(str(position[i])))))
             f.close()
         print "iteration finished"
 

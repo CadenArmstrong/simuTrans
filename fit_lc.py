@@ -214,7 +214,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    return
+    #return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':

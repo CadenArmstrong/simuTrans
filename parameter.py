@@ -3,13 +3,18 @@ import numpy as np
 
 class parameter():
     def __init__(self,val,upper,lower,name,fitflag=0,xmin=-np.inf,xmax=np.inf):
-        self.val=val
-        self.upper=upper
-        self.lower=lower
+        self.val=float(val)
+        self.upper=float(upper)
+        self.lower=float(lower)
+        if fitflag:
+            if self.upper<self.val or self.lower>self.val:
+                raise ValueError, 'The upper (lower) error bound for the fitted variable %s is smaller (larger) than the median value' % name
+            if float(xmax)<self.val or float(xmin)>self.val:
+                raise ValueError, 'The upper %f (lower %f) hard limit for the fitted variable %s is smaller (larger) than the median value %f' % (float(xmin),float(xmax),name,float(val))
         self.name=name
         self.fitflag=fitflag 
-        self.xmin=-np.inf
-        self.xmax=np.inf
+        self.xmin=float(xmin)
+        self.xmax=float(xmax)
         return
     def __str__(self):
         if self.fitflag==0:
