@@ -31,7 +31,7 @@ def read_lc(options):
     if not options.lc.inpath=="":
         if not os.path.exists(options.lc.inpath):
             raise IOError, "the input path for light curve file %s does not exist."
-    if not options.lc.infile=="":
+    try:
         if not os.path.exists(options.lc.inpath+'/'+options.lc.infile):
             raise IOError, "the light curve file %s does not exist."
 
@@ -39,17 +39,17 @@ def read_lc(options):
         #let's go with whitespace lcs first
         jd,mag=np.loadtxt(options.lc.inpath+'/'+options.lc.infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
         lcdata= [lightcurve(jd,mag,description=options.lc.inpath+'/'+options.lc.infile,cadence=options.lc.cadence)]
-    else:
+    except AttributeError:
         if not os.path.exists(options.lc.inpath+'/'+options.lc.inlist):
             raise IOError, "the light curve list %s does not exist."
         lcdata=[]
         #assuming the inlist only gives the file name, and files are under inpath
-        fin=open(lc.inlist,'r')
+        fin=open(options.lc.inpath+'/'+options.lc.inlist,'r')
         for line in fin.readlines():
             infile,cadence=line.rstrip().split()
-            infile=options.lc.inpath+infile
+            infile=options.lc.inpath+'/'+infile
             if not os.path.exists(infile):
-                raise IOError, "the light curve file %s does not exist."
+                raise IOError, "the light curve file %s does not exist." % infile
 
             jd,mag=np.loadtxt(infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
             lcdata.append(lightcurve(jd,mag,description=infile,cadence=cadence))

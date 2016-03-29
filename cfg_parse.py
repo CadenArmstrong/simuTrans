@@ -54,6 +54,9 @@ def fitlc_parse(options):
     try:
         setattr(options.lc,'infile',p.get('Section LC',"infile"))
         setattr(options.lc,'cadence',p.get('Section LC',"cadence"))
+        if options.lc.infile=="":
+            delattr(options.lc,'infile')
+            raise ConfigParser.NoOptionError(p,'infile')
     except ConfigParser.MissingSectionHeaderError:	
         raise 'Error: Section LC missing, excute set_parse to see example.cfg'
     except ConfigParser.NoOptionError:

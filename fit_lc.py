@@ -121,22 +121,22 @@ class Params():
     def check_init(self,lcdata):
         self.update()
         for i in xrange(len(lcdata)):
-            model_lc=self.model(lcdata[0].jd)
-            #for l in xrange(len(lcdata[0].jd)):
-            #    print lcdata[0].jd[l],model_lc[l]
+            model_lc=self.model(lcdata[i].jd)
+            #for l in xrange(len(lcdata[i].jd)):
+            #    print lcdata[i].jd[l],model_lc[l]
             try:
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
-                #ax.plot(lcdata[0].jd,lcdata[0].mag,'.')
-                #ax.plot(lcdata[0].jd,model_lc,'.')
-                #ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag)-lcdata[0].mag,'+')
-                ax.plot(lcdata[0].jd,model_lc-1+np.median(lcdata[0].mag)-lcdata[0].mag,'+')
-                #ax.plot(lcdata[0].jd,1-model_lc+np.median(lcdata[0].mag),'+')
-                #ax.plot(lcdata[0].jd,model_lc-1+np.median(lcdata[0].mag),'+')
-                #phase=self.cal_phase(lcdata[0].jd)
-                #ax.plot(lcdata[0].jd,1-model_lc,'+')
+                ax.plot(lcdata[i].jd,lcdata[i].mag,'.')
+                #ax.plot(lcdata[i].jd,model_lc,'.')
+                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
+                #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
+                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
+                ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag),'+')
+                #phase=self.cal_phase(lcdata[i].jd)
+                #ax.plot(lcdata[i].jd,1-model_lc,'+')
                 #ax.plot(phase,1-model_lc,'+')
-                #phase=self.cal_phase(lcdata[0].jd)/2./np.pi*self.readpara('P').val*3600.*24.
+                #phase=self.cal_phase(lcdata[i].jd)/2./np.pi*self.readpara('P').val*3600.*24.
                 #ax.plot(phase,model_lc,'+')
                 #ax.set_xlim([-8000,8000])
                 y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
@@ -201,6 +201,7 @@ def main():
         global plt
     cfg.fitlc_parse(options)
     #print options
+    #return
     fitparams=Params(options)
     MC=mcmc_engine(options)
     print fitparams
