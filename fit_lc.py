@@ -131,8 +131,8 @@ class Params():
                 #ax.plot(lcdata[i].jd,model_lc,'.')
                 #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
                 #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
-                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
-                ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag),'+')
+                ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
+                #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag),'+')
                 #phase=self.cal_phase(lcdata[i].jd)
                 #ax.plot(lcdata[i].jd,1-model_lc,'+')
                 #ax.plot(phase,1-model_lc,'+')
@@ -172,7 +172,7 @@ class Params():
         chisq=0
         for i in xrange(len(lcdata)):
             self.update()
-            model_lc=self.model(lcdata[i].jd)
+            model_lc=1.-self.model(lcdata[i].jd)
             x0 = [np.median(lcdata[i].mag)]
             
             def minfunc(x0):
