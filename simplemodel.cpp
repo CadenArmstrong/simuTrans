@@ -179,17 +179,18 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
         
 					for(int x=0;x<this->planet_grid_size;x++){
 						for(int y=0;y<this->planet_grid_size;y++){
-              	star_x = ((double(x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
-                	star_y = ((double(y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
+              	//star_x = ((double(x-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_x)*this->star_grid_size_half+this->star_grid_size_half;
+                //star_y = ((double(y-this->planet_grid_size_half)/this->planet_grid_size_half)*this->rp_rs+planet_position_y)*this->star_grid_size_half+this->star_grid_size_half;
 
-							//float planet_space_x = (1.0*(x-this->planet_grid_size_half)/(this->star_grid_size_half));
-							//float planet_space_y = (1.0*(y-this->planet_grid_size_half)/(this->star_grid_size_half));
-							//float star_space_x = (planet_space_x*this->rp_rs + planet_position_x);
-							//float star_space_y = (planet_space_y*this->rp_rs + planet_position_y);
-							//star_x = (int)(this->star_grid_size_half*(1.0+star_space_x));
-							//star_y = (int)(this->star_grid_size_half*(1.0+star_space_y));
-
-        	
+							float planet_space_x = (1.0*(x-this->planet_grid_size_half)/(this->planet_grid_size_half));
+							float planet_space_y = (1.0*(y-this->planet_grid_size_half)/(this->planet_grid_size_half));
+							float star_space_x = (planet_space_x*this->rp_rs + planet_position_x);
+							float star_space_y = (planet_space_y*this->rp_rs + planet_position_y);
+							star_x = (int)round(this->star_grid_size_half*(1.0+star_space_x));
+							star_y = (int)round(this->star_grid_size_half*(1.0+star_space_y));
+              //if(a>897 && a<898){
+              //printf("%d %d %d %d %f %f %f %f %d %d\n",x,y,star_x,star_y,planet_space_x,planet_space_y,star_space_x,star_space_y,star_x0,star_y0);
+        	    //}
         //printf("%d %f %f %f\n",a,planet_position_x,planet_position_y,theta);
 				//if(sqrt(pow(planet_position_x,2)+pow(planet_position_y,2)) < (1.0*r_b_s/sqrt(pow(r_b_s*cos(theta),2)+pow(1.0*sin(theta),2))) + (this->rp_rs*(this->rp_rs*r_b_p)/sqrt(pow(this->rp_rs*r_b_p*cos(theta),2)+pow(this->rp_rs*sin(theta),2)))){
 
