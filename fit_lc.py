@@ -166,6 +166,7 @@ class Params():
     def lc_chisq(self,freeparamarr,lcdata):
         #lci = lcdata.copy()
         #cadence = find_cadence(lci)
+        print freeparamarr
         self.updatedic(freeparamarr)
         if not self.checkbound():
             return -np.inf
@@ -186,6 +187,8 @@ class Params():
                 chisq = -np.inf ### if it doesn't transit, return -1*inf
                 return chisq
             diff = lcdata[i].mag+x0[0] - model_lc
+            plt.plot(lcdata[i].jd,diff,'.')
+            plt.show()
             chisq_i=sum((diff/lcdata[i].err)**2)
             chisq +=chisq_i 
 
@@ -215,7 +218,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    return
+    #return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
