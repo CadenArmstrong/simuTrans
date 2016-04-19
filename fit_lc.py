@@ -19,7 +19,6 @@ class Params():
         vararr=np.zeros(len(self.paramarr)) 
         keyarr=[]
         self.lenfree=0
-        self.transitmodel=tmodel()
         self.qflag=False
         for i in xrange(len(self.paramarr)):
             vararr[i]=i
@@ -32,6 +31,7 @@ class Params():
         self.paradic=dict(zip(keyarr,vararr))
         self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'Mstar':1.0,'Rstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
+        self.transitmodel=tmodel(int(self.readpara('star_gridsize').val), int(self.readpara('planet_gridsize').val))
         return
     def __str__(self):
         string=""
@@ -240,7 +240,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    return
+    #return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':

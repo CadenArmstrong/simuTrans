@@ -38,7 +38,7 @@
 using namespace std;
 class SimpleModel{
 	public:
-		SimpleModel();
+		SimpleModel(int star_grid_size, int planet_grid_size);
 		~SimpleModel();
 		void SetupStar(double *star_params, int np);
 		void SetupPlanet(double *planet_params, int np);

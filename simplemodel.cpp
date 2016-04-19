@@ -1,17 +1,31 @@
 #include "simplemodel.h"
 #include "Zeipelmodel.cpp"
 
-SimpleModel::SimpleModel(void){}
-SimpleModel::~SimpleModel(){};
-void SimpleModel::SetupStar(double *star_params, int np){
-			this->star_grid_size = (int)star_params[KEY_SS_GRID_SIZE];
-			if(this->star_grid_size % 2 == 0){
+SimpleModel::SimpleModel(int star_grid_size, int planet_grid_size){
+
+		this->star_grid_size = star_grid_size;
+		if(this->star_grid_size % 2 == 0){
 		//		printf("Even sized grid detected, moving to odd size\n");
 				this->star_grid_size += 1;
 			}
 			this->star_grid_size_half = (this->star_grid_size-1)/2;
 			this->star_pixel_size = 1.0/(this->star_grid_size_half*this->star_grid_size_half);
-			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
+    this->planet_grid_size = planet_grid_size;
+			if(this->planet_grid_size % 2 == 0){
+			//	printf("Even sized grid detected, moving to odd size\n");
+				this->planet_grid_size += 1;
+			}
+			this->planet_grid_size_half = (this->planet_grid_size-1)/2;
+
+		this->planet_oppacity_map = (double*)calloc((this->planet_grid_size*this->planet_grid_size),sizeof(double));
+	  this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
+}
+SimpleModel::~SimpleModel(){
+  delete [] this->star_flux_map;
+  delete [] this-> planet_oppacity_map;
+};
+void SimpleModel::SetupStar(double *star_params, int np){
+
 			this->star_flattening = 1.0-sqrt(pow(1.0-star_params[KEY_SS_FLATTENING],2)*pow(cos(star_params[KEY_SS_OBLIQUITY]),2) + pow(sin(star_params[KEY_SS_OBLIQUITY]),2)); // Effective flattening
 			this->star_obliquity = star_params[KEY_SS_OBLIQUITY];
 			this->max_brightness = 0.0; // IMG
@@ -65,13 +79,6 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			printf("#Star setup complete\n");
 		};
 void SimpleModel::SetupPlanet(double *planet_params, int np){
-			this->planet_grid_size = (int)planet_params[KEY_PS_GRID_SIZE];
-			if(this->planet_grid_size % 2 == 0){
-			//	printf("Even sized grid detected, moving to odd size\n");
-				this->planet_grid_size += 1;
-			}
-			this->planet_oppacity_map = (double*)calloc((this->planet_grid_size*this->planet_grid_size),sizeof(double));
-			this->planet_grid_size_half = (this->planet_grid_size-1)/2;
 			this->rp_rs = planet_params[KEY_PS_RPRS];
 			this->planet_pixel_size = this->rp_rs*this->rp_rs/(this->planet_grid_size_half*this->planet_grid_size_half);
 			this->semi_major = planet_params[KEY_PS_SEMI_MAJOR_AXIS];
@@ -125,8 +132,8 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
         //printf("%d %f %f %f %f %f\n",a,planet_position_x,planet_position_y,d_to_p,r_of_p,r_of_s);
 			  current_flux = 0;
 				if(d_to_p <= r_of_p + r_of_s){
-					if(a%15==0){
-					//if(a>780 && a<782){
+					//if(a%15==0){
+					if(a>780 && a<781){
 						// IMG
 						FILE *image; // IMG
 						char imgname[100];// IMG
