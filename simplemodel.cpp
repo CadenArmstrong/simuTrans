@@ -125,8 +125,8 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
         //printf("%d %f %f %f %f %f\n",a,planet_position_x,planet_position_y,d_to_p,r_of_p,r_of_s);
 			  current_flux = 0;
 				if(d_to_p <= r_of_p + r_of_s){
-					//if(a%15==0){
-					if(a>890 && a<891){
+					if(a%15==0){
+					//if(a>780 && a<782){
 						// IMG
 						FILE *image; // IMG
 						char imgname[100];// IMG

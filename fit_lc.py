@@ -127,11 +127,11 @@ class Params():
             try:
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
-                ax.plot(lcdata[i].jd,lcdata[i].mag,'.')
+                #ax.plot(lcdata[i].jd,lcdata[i].mag,'.')
                 #ax.plot(lcdata[i].jd,model_lc,'.')
-                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
+                ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
                 #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
-                ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
+                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
                 #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag),'+')
                 #phase=self.cal_phase(lcdata[i].jd)
                 #ax.plot(lcdata[i].jd,1-model_lc,'+')
@@ -142,6 +142,24 @@ class Params():
                 y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
                 ax.yaxis.set_major_formatter(y_formatter)
                 plt.show()
+                model_lc=1.-model_lc
+                x0 = [np.median(lcdata[i].mag)]
+                
+                def minfunc(x0):
+                    flux_ii = lcdata[i].mag + x0[0]
+                    
+                    return (flux_ii-model_lc)/lcdata[i].err**2.
+
+                x0 = optimize.leastsq(minfunc,x0)
+
+                if np.std(model_lc) == 0:
+                    chisq = -np.inf ### if it doesn't transit, return -1*inf
+                    return chisq
+                diff = lcdata[i].mag+x0[0] - model_lc
+                chisq_i=sum((diff/lcdata[i].err)**2)
+                print chisq_i 
+
+
             except NameError:
                 #raise
                 continue
@@ -159,6 +177,12 @@ class Params():
 
     def checkbound(self):
         for i in xrange(self.lenfree):
+            if self.paramarr[i].name=='phi' or self.paramarr[i].name=='lambda':
+                if self.paramarr[i].val>self.paramarr[i].xmax:
+                    self.paramarr[i]=self.paramarr[i]-180.*int((self.paramarr[i]-self.paramarr[i].xmin)/180.)
+                if self.paramarr[i].val<self.paramarr[i].xmin:
+                    self.paramarr[i]=self.paramarr[i]+180.*int((-self.paramarr[i]+self.paramarr[i].xmax)/180.)
+                continue
             if self.paramarr[i].val>self.paramarr[i].xmax or self.paramarr[i].val<self.paramarr[i].xmin:
                 return False
         return True
@@ -166,8 +190,8 @@ class Params():
     def lc_chisq(self,freeparamarr,lcdata):
         #lci = lcdata.copy()
         #cadence = find_cadence(lci)
-        print freeparamarr
         self.updatedic(freeparamarr)
+        print freeparamarr
         if not self.checkbound():
             return -np.inf
         chisq=0
@@ -187,12 +211,10 @@ class Params():
                 chisq = -np.inf ### if it doesn't transit, return -1*inf
                 return chisq
             diff = lcdata[i].mag+x0[0] - model_lc
-            plt.plot(lcdata[i].jd,diff,'.')
-            plt.show()
             chisq_i=sum((diff/lcdata[i].err)**2)
             chisq +=chisq_i 
 
-        print self.readpara('u1').val,self.readpara('u2').val,self.readpara('b').val,self.readpara('sma').val,chisq
+        #print 'u1,u2,b2,sma=',self.readpara('u1').val,self.readpara('u2').val,self.readpara('b2').val,self.readpara('sma').val,chisq
         return -chisq
 
 def main():
@@ -218,7 +240,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    #return
+    return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
