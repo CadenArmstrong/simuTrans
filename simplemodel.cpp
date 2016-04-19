@@ -76,7 +76,7 @@ void SimpleModel::SetupStar(double *star_params, int np){
 				//printf("\n");
 			}
 			this->star_total_flux = total_flux;
-			printf("#Star setup complete\n");
+			//printf("#Star setup complete\n");
 		};
 void SimpleModel::SetupPlanet(double *planet_params, int np){
 			this->rp_rs = planet_params[KEY_PS_RPRS];
@@ -100,12 +100,12 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 					}
 				}
 			}
-			printf("#Planet setup complete\n");
+			//printf("#Planet setup complete\n");
 		};
 
 
 void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo){
-			printf("#Starting integration\n");
+			//printf("#Starting integration\n");
 			double planet_position_x = 0;
 			double planet_position_y = 0;
 			long double current_flux = 0;
@@ -213,7 +213,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 				}
 			}
 					
-		printf("#Flux integration complete\n");
+		//printf("#Flux integration complete\n");
 };
 
 

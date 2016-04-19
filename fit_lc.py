@@ -13,7 +13,25 @@ from Emceewrapper import mcmc_engine
 from simplemodel import SimpleModel as tmodel 
 import time
 import copy
-class Params():
+
+
+class PickalableSWIG:
+    def __setstate__(self, state):
+        self.__init__(*state['args'])
+
+    def __getstate__(self):
+        return {'args': self.args}
+
+class PickalableC(tmodel, PickalableSWIG):
+
+    def __init__(self, *args):
+        self.args = args
+        tmodel.__init__(self,*args)
+
+
+
+
+class Params(object):
     def __init__(self,options):
         self.paramarr=options.params
         vararr=np.zeros(len(self.paramarr)) 
@@ -31,14 +49,16 @@ class Params():
         self.paradic=dict(zip(keyarr,vararr))
         self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'Mstar':1.0,'Rstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
-        self.transitmodel=tmodel(int(self.readpara('star_gridsize').val), int(self.readpara('planet_gridsize').val))
+        self.transitmodel=PickalableC(int(self.readpara('star_gridsize').val), int(self.readpara('planet_gridsize').val))
         return
     def __str__(self):
         string=""
         for key,value in self.paradic.iteritems():
             string+="%s\n" % (self.paramarr[int(value)])
         return string
+    def __call__(self, freeparamarr,lcdata):
 
+        return self.lc_chisq(freeparamarr,lcdata)
     def readpara(self,name):
         #print self.paradic[name]
         return self.paramarr[int(self.paradic[name])]
@@ -191,7 +211,6 @@ class Params():
         #lci = lcdata.copy()
         #cadence = find_cadence(lci)
         self.updatedic(freeparamarr)
-        print freeparamarr
         if not self.checkbound():
             return -np.inf
         chisq=0
@@ -228,6 +247,7 @@ def main():
     #print options
     #return
     fitparams=Params(options)
+
     MC=mcmc_engine(options)
     print fitparams
     #return
