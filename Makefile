@@ -1,4 +1,4 @@
-OBJECT = simplemodel.o simutrans.o Zeipelmodel.o 
+OBJECT = simplemodel.o simutrans.o Zeipelmodel.o Laramodel.o 
 PROJECT = simutranscc
 SIMPLEMODEL_SOURCES = simplemodel.h
 #TRANSITMODEL_INTERFACE = transitmodel.i

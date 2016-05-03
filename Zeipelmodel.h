@@ -2,7 +2,8 @@
 #define ZEIPELMODEL_H
 #include <stdio.h>
 #include <math.h>
-class ZeipelModel{
+#include "GDmodel.h"
+class ZeipelModel : public GDmodel{
   public:
     /* fratio is 1-Rpole/Req; 
      * phi is the angle of star spin to sky plane;

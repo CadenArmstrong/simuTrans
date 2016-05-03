@@ -1,5 +1,7 @@
 #include "simplemodel.h"
-#include "Zeipelmodel.cpp"
+#include "GDmodel.h"
+#include "Zeipelmodel.h"
+#include "Laramodel.h"
 
 SimpleModel::SimpleModel(int star_grid_size, int planet_grid_size){
 
@@ -37,10 +39,18 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			double BB; // Black body function
 			double GEFF;
 			double vec[2];
-			double ggraveq = pow((1.0-this->star_flattening),2);
-
-
-			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+      GDmodel* gdmodel;
+      if (star_params[KEY_SS_GDFLAG]>0){ 
+			  double ggraveq = pow((1.0-this->star_flattening),2);
+        if(star_params[KEY_SS_GDFLAG]==1){ 
+			    gdmodel= new ZeipelModel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+        } else{
+        if(star_params[KEY_SS_GDFLAG]==2){ 
+			    gdmodel=new LaraModel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+        }
+        
+        }
+      }
 
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
@@ -53,8 +63,17 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						vec[0] = 1.0*(x-this->star_grid_size_half)/this->star_grid_size_half;
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
-						GEFF = zeipel.Calgeff(vec,2);
-						BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
+              if(star_params[KEY_SS_GDFLAG]==1){ 
+                //GD from Zeiple model
+						    GEFF = gdmodel->Calgeff(vec,2);
+						    BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
+              } else {
+                if(star_params[KEY_SS_GDFLAG]==2){ 
+                //GD from Lara model, we are actually return Teff instead
+						    GEFF = gdmodel->Calgeff(vec,2);
+						    BB = pow(GEFF,4.);
+                }
+              }
             } else{
               BB=1.0; 
             }

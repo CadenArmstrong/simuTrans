@@ -18,6 +18,7 @@
 #define KEY_SS_OBLIQUITY 4 // the angle between the stellar spin with the sky plane
 #define KEY_SS_GROTEQ 5 // Constant for rotational rate of star, gravitation constant, and stellar mass
 #define KEY_SS_G_DARK 6 // Gravity darkening parameter
+#define KEY_SS_GDFLAG 7 // Gravity darkening parameter
 
 // **********************
 
