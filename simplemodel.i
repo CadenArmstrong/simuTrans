@@ -13,6 +13,8 @@ import_array();
 
 %{
 #include "simplemodel.h"
+#include "GDmodel.h"
 %}
 
 %include "simplemodel.h"
+%include "GDmodel.h"

@@ -8,7 +8,7 @@ class LaraModel : public GDmodel{
     LaraModel(double fratio,double phi,double Req,  double ggraveq, double groteq);
     ~LaraModel();
     //a in cgs/rsun, b is b*Rpole;
-    inline double Cal_geff(double *x, int nx);
+    inline double Calgeff(double *x, int nx);
    private:
     static const int kDimen_ = 2;
     //QuadTwoD* quad2d;

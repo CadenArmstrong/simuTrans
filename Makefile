@@ -1,8 +1,8 @@
 OBJECT = simplemodel.o simutrans.o Zeipelmodel.o Laramodel.o 
 PROJECT = simutranscc
-SIMPLEMODEL_SOURCES = simplemodel.h
+SIMPLEMODEL_SOURCES = simplemodel.h simplemodel.cpp Zeipelmodel.cpp Zeipelmodel.h Laramodel.cpp Laramodel.h GDmodel.h 
 #TRANSITMODEL_INTERFACE = transitmodel.i
-SIMPLEMODEL_INTERFACE = simplemodel.i
+SIMPLEMODEL_INTERFACE = simplemodel.i Laramodel.i Zeipelmodel.i
 SOURCES = $(SIMPLEMODEL_SOURCES)
 INTERFACES = $(SIMPLEMODEL_INTERFACE)
 WRAPPERS = $(INTERFACES:.i=_wrap.cxx)

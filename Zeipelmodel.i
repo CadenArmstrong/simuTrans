@@ -10,7 +10,9 @@ import_array();
 
 
 %{
+#include "GDmodel.h"
 #include "ZeipelModel.h"
 %}
 
+%include "GDmodel.h"
 %include "ZeipelModel.h"

@@ -10,9 +10,9 @@ import_array();
 
 
 %{
-#include "model.h"
+#include "GDmodel.h"
 #include "LaraModel.h"
 %}
 
-%include "model.h"
+%include "GDmodel.h"
 %include "LaraModel.h"

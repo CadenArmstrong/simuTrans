@@ -11,7 +11,7 @@ LaraModel::~LaraModel(){
   //delete quad2d;
 }
 
-double LaraModel::Cal_geff(double *x, int nx){
+double LaraModel::Calgeff(double *x, int nx){
   double T;
   double d,z;
   double r[3];
