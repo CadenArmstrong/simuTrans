@@ -26,6 +26,9 @@ SimpleModel::~SimpleModel(){
   delete [] this->star_flux_map;
   delete [] this-> planet_oppacity_map;
 };
+
+
+
 void SimpleModel::SetupStar(double *star_params, int np){
 
 			this->star_flattening = 1.0-sqrt(pow(1.0-star_params[KEY_SS_FLATTENING],2)*pow(cos(star_params[KEY_SS_OBLIQUITY]),2) + pow(sin(star_params[KEY_SS_OBLIQUITY]),2)); // Effective flattening
@@ -122,6 +125,23 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 			//printf("#Planet setup complete\n");
 		};
 
+void SimpleModel::Rossiter(double *phase, int np, double *flux_out, int npo){
+    
+    double beta,xperp,yperp,zperp,zprime,yprime,vstel;
+    
+    beta = pi/2.-this->star_obliquity;
+
+    xperp = x*cos(this->obliquity)-y*sin(this->obliquity);
+    yperp = x*sin(this->obliquity)+y*cos(this->obliquity);
+    zperp = sqrt(1-xperp**2-yperp**2);
+
+    zprime = zperp*cos(beta)-yperp*sin(beta);
+    yprime = zperp*sin(beta)+yperp*cos(beta);
+
+    vstel = xperp*veq*sin(phi)*(1-alpha*yprime**2);
+
+    return 
+}
 
 void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo){
 			//printf("#Starting integration\n");
