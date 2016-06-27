@@ -12,7 +12,7 @@ class lightcurve(object):
         self.description=description
         self.cadence=cadence
         if err is None:
-            self.err=np.zeros(len(jd))+1
+            self.err=np.zeros(len(jd))+1.e-3
         else:
             self.err=err
         return

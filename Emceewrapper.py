@@ -40,11 +40,11 @@ class mcmc_engine():
         sampler.reset()
     
         #master_pos = []
-        f=open(self.output,"w")
-        f.close()
+        f=open(self.output,"a")
+        #f.close()
         for result in sampler.sample(pos, iterations=self.niter, storechain=False):
             position,probability = result[0],result[1]
-            f=open(self.output,"a")
+            #f=open(self.output,"a")
             for i in range(position.shape[0]):
                 if np.isnan(probability[i]):
                     continue
@@ -54,7 +54,7 @@ class mcmc_engine():
                     f.write(" %f" % position[i][j])
                 f.write(" %f\n" % probability[i])
                 #f.write("{0:4d} {1:s} \n".format(i," ".join(list(str(position[i])))))
-            f.close()
+        f.close()
         print "iteration finished"
 
 
