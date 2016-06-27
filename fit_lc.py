@@ -61,6 +61,10 @@ class Params(object):
     def __call__(self, freeparamarr,lcdata):
 
         return self.lc_chisq(freeparamarr,lcdata)
+    def almosteq(self,a,b,tol=1.e-7):
+        
+        return np.abs(a-b)<tol
+
     def readpara(self,name):
         #print self.paradic[name]
         return self.paramarr[int(self.paradic[name])]
@@ -122,25 +126,25 @@ class Params(object):
             self.readpara('u1').val=u1
             self.readpara('u2').val=u2
         return 
-    def getshortcadence(self,jd,cadence):
+    def getshortcadence(self,jd,cadence,Nresample=5):
         tmax=np.max(jd)+cadence/2.
         tmin=np.min(jd)-cadence/2.
-        ncadence=(tmax-tmin)/(1./60./24.)
-        shortcadence=tmin+np.arange(ncadence)*1./60./24. 
+        ncadence=(tmax-tmin)/(cadence/Nresample)
+        shortcadence=tmin+np.arange(ncadence)*(cadence/Nresample) 
         return shortcadence
-    def getlc(self,jd,cadence,shortcadence,model_sc):
+    def getlc(self,jd,cadence,shortcadence,model_sc,Nresample=5):
         model_lc=np.zeros(len(jd))
         t0=shortcadence[0]
         length=len(shortcadence)
-        index1=(((jd+0.5*cadence)-t0)/(1./60./24.)).astype(int)
-        index2=(((jd-0.5*cadence)-t0)/(1./60./24.)).astype(int)
+        index1=(((jd+0.5*cadence)-t0)/(cadence/Nresample)).astype(int)
+        index2=(((jd-0.5*cadence)-t0)/(cadence/Nresample)).astype(int)
         np.where(index2<0,index2,0)
         np.where(index1>(length-1),index1,length-1)
         for i in xrange(len(model_lc)): 
             model_lc[i]=np.mean(model_sc[index2[i]:(index1[i]+1)])
         return model_lc
     def model(self,jd,cadence=1./60./24.):
-        if cadence==1./60./24:
+        if self.almosteq(cadence,1./60./24):
             shortcadence=jd
         else:
             shortcadence=self.getshortcadence(jd,cadence)
@@ -151,7 +155,7 @@ class Params(object):
         model_sc=np.zeros(len(phase))
         #print type(phase),type(model_lc)
         self.transitmodel.RelativeFlux(phase,model_sc)
-        if cadence==1./60./24:
+        if self.almosteq(cadence,1./60./24):
             return model_sc
         else:
             model_lc=self.getlc(jd,cadence,shortcadence,model_sc)
@@ -194,7 +198,7 @@ class Params(object):
                 def minfunc(x0):
                     flux_ii = lcdata[i].mag + x0[0]
                     
-                    return (flux_ii-model_lc)/lcdata[i].err**2.
+                    return ((flux_ii-model_lc)/lcdata[i].err)**2.
 
                 x0 = optimize.leastsq(minfunc,x0)
 
@@ -203,7 +207,7 @@ class Params(object):
                     return chisq
                 diff = lcdata[i].mag+x0[0] - model_lc
                 chisq_i=sum((diff/lcdata[i].err)**2)
-                print chisq_i 
+                print  chisq_i, np.mean(lcdata[i].err),np.mean(diff),np.std(diff)
 
 
             except NameError:
@@ -249,7 +253,7 @@ class Params(object):
             def minfunc(x0):
                 flux_ii = lcdata[i].mag + x0[0]
                 
-                return (flux_ii-model_lc)/lcdata[i].err**2.
+                return ((flux_ii-model_lc)/lcdata[i].err)**2.
 
             x0 = optimize.leastsq(minfunc,x0)
 
