@@ -125,23 +125,23 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 			//printf("#Planet setup complete\n");
 		};
 
-void SimpleModel::Rossiter(double *phase, int np, double *flux_out, int npo){
-    
-    double beta,xperp,yperp,zperp,zprime,yprime,vstel;
-    
-    beta = pi/2.-this->star_obliquity;
-
-    xperp = x*cos(this->obliquity)-y*sin(this->obliquity);
-    yperp = x*sin(this->obliquity)+y*cos(this->obliquity);
-    zperp = sqrt(1-xperp**2-yperp**2);
-
-    zprime = zperp*cos(beta)-yperp*sin(beta);
-    yprime = zperp*sin(beta)+yperp*cos(beta);
-
-    vstel = xperp*veq*sin(phi)*(1-alpha*yprime**2);
-
-    return 
-}
+//void SimpleModel::Rossiter(double *phase, int np, double *flux_out, int npo){
+//    
+//    double beta,xperp,yperp,zperp,zprime,yprime,vstel;
+//    
+//    beta = pi/2.-this->star_obliquity;
+//
+//    xperp = x*cos(this->obliquity)-y*sin(this->obliquity);
+//    yperp = x*sin(this->obliquity)+y*cos(this->obliquity);
+//    zperp = sqrt(1-xperp**2-yperp**2);
+//
+//    zprime = zperp*cos(beta)-yperp*sin(beta);
+//    yprime = zperp*sin(beta)+yperp*cos(beta);
+//
+//    vstel = xperp*veq*sin(phi)*(1-alpha*yprime**2);
+//
+//    return 
+//}
 
 void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo){
 			//printf("#Starting integration\n");

@@ -122,28 +122,52 @@ class Params(object):
             self.readpara('u1').val=u1
             self.readpara('u2').val=u2
         return 
-
-    def model(self,cadence):
-        phase=self.cal_phase(cadence)
+    def getshortcadence(self,jd,cadence):
+        tmax=np.max(jd)+cadence/2.
+        tmin=np.min(jd)-cadence/2.
+        ncadence=(tmax-tmin)/(1./60./24.)
+        shortcadence=tmin+np.arange(ncadence)*1./60./24. 
+        return shortcadence
+    def getlc(self,jd,cadence,shortcadence,model_sc):
+        model_lc=np.zeros(len(jd))
+        t0=shortcadence[0]
+        length=len(shortcadence)
+        index1=(((jd+0.5*cadence)-t0)/(1./60./24.)).astype(int)
+        index2=(((jd-0.5*cadence)-t0)/(1./60./24.)).astype(int)
+        np.where(index2<0,index2,0)
+        np.where(index1>(length-1),index1,length-1)
+        for i in xrange(len(model_lc)): 
+            model_lc[i]=np.mean(model_sc[index2[i]:(index1[i]+1)])
+        return model_lc
+    def model(self,jd,cadence=1./60./24.):
+        if cadence==1./60./24:
+            shortcadence=jd
+        else:
+            shortcadence=self.getshortcadence(jd,cadence)
+        phase=self.cal_phase(shortcadence)
         #phase=np.arcsin((np.arange(50)-25.)/25.*0.75/5000.)
         #print phase
-        model_lc=np.zeros(len(phase))
-        #print type(phase),type(model_lc)
-        self.transitmodel.RelativeFlux(phase,model_lc)
-        return model_lc
 
-    def cal_phase(self,cadence):
+        model_sc=np.zeros(len(phase))
+        #print type(phase),type(model_lc)
+        self.transitmodel.RelativeFlux(phase,model_sc)
+        if cadence==1./60./24:
+            return model_sc
+        else:
+            model_lc=self.getlc(jd,cadence,shortcadence,model_sc)
+            return model_lc
+    def cal_phase(self,jd):
         #calculate the phase of the planet orbit from the cadence
         period=self.readpara('P').val
         epoch=self.readpara('T0').val
 #phase=np.pi*((cadence-epoch)/period-np.round((cadence-epoch)/period))
-        phase=np.pi*2.*((cadence-epoch)/period-np.round((cadence-epoch)/period))
+        phase=np.pi*2.*((jd-epoch)/period-np.round((jd-epoch)/period))
         return phase 
 
     def check_init(self,lcdata):
         self.update()
         for i in xrange(len(lcdata)):
-            model_lc=self.model(lcdata[i].jd)
+            model_lc=self.model(lcdata[i].jd,lcdata[i].cadence)
             #for l in xrange(len(lcdata[i].jd)):
             #    print lcdata[i].jd[l],model_lc[l]
             try:
@@ -219,7 +243,7 @@ class Params(object):
         chisq=0
         for i in xrange(len(lcdata)):
             self.update()
-            model_lc=1.-self.model(lcdata[i].jd)
+            model_lc=1.-self.model(lcdata[i].jd,lcdata[i].cadence)
             x0 = [np.median(lcdata[i].mag)]
             
             def minfunc(x0):
