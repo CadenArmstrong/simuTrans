@@ -12,7 +12,10 @@ class lightcurve(object):
         self.description=description
         self.cadence=cadence
         if err is None:
-            self.err=np.zeros(len(jd))+1.e-3
+            if np.abs(cadence-1./60./24.)<1.e-7:
+                self.err=np.zeros(len(jd))+2.7e-4
+            else:
+                self.err=np.zeros(len(jd))+2.7e-4/(cadence*60.*24.)**0.5
         else:
             self.err=err
         return
@@ -46,12 +49,14 @@ def read_lc(options):
         #assuming the inlist only gives the file name, and files are under inpath
         fin=open(options.lc.inpath+'/'+options.lc.inlist,'r')
         for line in fin.readlines():
+            if line.startswith("#"):
+                continue
             infile,cadence=line.rstrip().split()
             infile=options.lc.inpath+'/'+infile
             if not os.path.exists(infile):
                 raise IOError, "the light curve file %s does not exist." % infile
 
             jd,mag=np.loadtxt(infile,usecols=(options.lc.coljd-1,options.lc.colmag-1),unpack=True)
-            lcdata.append(lightcurve(jd,mag,description=infile,cadence=cadence))
+            lcdata.append(lightcurve(jd,mag,description=infile,cadence=float(cadence)))
     return lcdata
 
