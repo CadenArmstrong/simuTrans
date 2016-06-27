@@ -1,14 +1,14 @@
 #include "simplemodel.h"
 
 int main(int argc, char *argv[]){
-	double star_params[] = {5000,0.3,0.3,2.1,0.95}; // grid size, limb1, limb2, grav1 (unused), flattening (unused)
-	double planet_params[] = {200,0.1,0.15,500.0,0.05}; // grid size, impact, rprs, semimajor, obliquity
+	double star_params[] = {0.3,0.3,2.1,0.95}; // grid size, limb1, limb2, grav1 (unused), flattening (unused)
+	double planet_params[] = {0.1,0.15,500.0,0.05}; // grid size, impact, rprs, semimajor, obliquity
 	int phase_points = 100;
 	double phase[phase_points];
 	for(int a = 0; a < phase_points; a++){
 		phase[a] = asin(((a-(phase_points/2.0))/(phase_points/2.0))/500.0);
 	}
-	SimpleModel model;
+	SimpleModel model(5000,200);
 	model.SetupStar(star_params,5);
 	model.SetupPlanet(planet_params,5);
 

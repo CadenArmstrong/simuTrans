@@ -1,17 +1,36 @@
 #include "simplemodel.h"
-#include "Zeipelmodel.cpp"
+#include "GDmodel.h"
+#include "Zeipelmodel.h"
+#include "Laramodel.h"
 
-SimpleModel::SimpleModel(void){}
-SimpleModel::~SimpleModel(){};
-void SimpleModel::SetupStar(double *star_params, int np){
-			this->star_grid_size = (int)star_params[KEY_SS_GRID_SIZE];
-			if(this->star_grid_size % 2 == 0){
+SimpleModel::SimpleModel(int star_grid_size, int planet_grid_size){
+
+		this->star_grid_size = star_grid_size;
+		if(this->star_grid_size % 2 == 0){
 		//		printf("Even sized grid detected, moving to odd size\n");
 				this->star_grid_size += 1;
 			}
 			this->star_grid_size_half = (this->star_grid_size-1)/2;
 			this->star_pixel_size = 1.0/(this->star_grid_size_half*this->star_grid_size_half);
-			this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
+    this->planet_grid_size = planet_grid_size;
+			if(this->planet_grid_size % 2 == 0){
+			//	printf("Even sized grid detected, moving to odd size\n");
+				this->planet_grid_size += 1;
+			}
+			this->planet_grid_size_half = (this->planet_grid_size-1)/2;
+
+		this->planet_oppacity_map = (double*)calloc((this->planet_grid_size*this->planet_grid_size),sizeof(double));
+	  this->star_flux_map = (double*)calloc((this->star_grid_size*this->star_grid_size),sizeof(double));
+}
+SimpleModel::~SimpleModel(){
+  delete [] this->star_flux_map;
+  delete [] this-> planet_oppacity_map;
+};
+
+
+
+void SimpleModel::SetupStar(double *star_params, int np){
+
 			this->star_flattening = 1.0-sqrt(pow(1.0-star_params[KEY_SS_FLATTENING],2)*pow(cos(star_params[KEY_SS_OBLIQUITY]),2) + pow(sin(star_params[KEY_SS_OBLIQUITY]),2)); // Effective flattening
 			this->star_obliquity = star_params[KEY_SS_OBLIQUITY];
 			this->max_brightness = 0.0; // IMG
@@ -23,10 +42,18 @@ void SimpleModel::SetupStar(double *star_params, int np){
 			double BB; // Black body function
 			double GEFF;
 			double vec[2];
-			double ggraveq = pow((1.0-this->star_flattening),2);
-
-
-			ZeipelModel zeipel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+      GDmodel* gdmodel;
+      if (star_params[KEY_SS_GDFLAG]>0){ 
+			  double ggraveq = pow((1.0-this->star_flattening),2);
+        if(star_params[KEY_SS_GDFLAG]==1){ 
+			    gdmodel= new ZeipelModel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+        } else{
+        if(star_params[KEY_SS_GDFLAG]==2){ 
+			    gdmodel=new LaraModel(this->star_flattening,this->star_obliquity, 1.0,ggraveq,pow(1.0-this->star_flattening,2)*star_params[KEY_SS_GROTEQ]);
+        }
+        
+        }
+      }
 
 			for(int x=0;x<this->star_grid_size;x++){
 				for(int y = 0;y<this->star_grid_size;y++){
@@ -39,8 +66,17 @@ void SimpleModel::SetupStar(double *star_params, int np){
 						vec[0] = 1.0*(x-this->star_grid_size_half)/this->star_grid_size_half;
 						vec[1] = 1.0*(y-this->star_grid_size_half)/this->star_grid_size_half;
             //printf("vec:%f %f\n",vec[0],vec[1]);
-						GEFF = zeipel.Calgeff(vec,2);
-						BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
+              if(star_params[KEY_SS_GDFLAG]==1){ 
+                //GD from Zeiple model
+						    GEFF = gdmodel->Calgeff(vec,2);
+						    BB = pow(GEFF,4.*star_params[KEY_SS_G_DARK]);
+              } else {
+                if(star_params[KEY_SS_GDFLAG]==2){ 
+                //GD from Lara model, we are actually return Teff instead
+						    GEFF = gdmodel->Calgeff(vec,2);
+						    BB = pow(GEFF,4.);
+                }
+              }
             } else{
               BB=1.0; 
             }
@@ -62,16 +98,9 @@ void SimpleModel::SetupStar(double *star_params, int np){
 				//printf("\n");
 			}
 			this->star_total_flux = total_flux;
-			printf("#Star setup complete\n");
+			//printf("#Star setup complete\n");
 		};
 void SimpleModel::SetupPlanet(double *planet_params, int np){
-			this->planet_grid_size = (int)planet_params[KEY_PS_GRID_SIZE];
-			if(this->planet_grid_size % 2 == 0){
-			//	printf("Even sized grid detected, moving to odd size\n");
-				this->planet_grid_size += 1;
-			}
-			this->planet_oppacity_map = (double*)calloc((this->planet_grid_size*this->planet_grid_size),sizeof(double));
-			this->planet_grid_size_half = (this->planet_grid_size-1)/2;
 			this->rp_rs = planet_params[KEY_PS_RPRS];
 			this->planet_pixel_size = this->rp_rs*this->rp_rs/(this->planet_grid_size_half*this->planet_grid_size_half);
 			this->semi_major = planet_params[KEY_PS_SEMI_MAJOR_AXIS];
@@ -93,12 +122,29 @@ void SimpleModel::SetupPlanet(double *planet_params, int np){
 					}
 				}
 			}
-			printf("#Planet setup complete\n");
+			//printf("#Planet setup complete\n");
 		};
 
+//void SimpleModel::Rossiter(double *phase, int np, double *flux_out, int npo){
+//    
+//    double beta,xperp,yperp,zperp,zprime,yprime,vstel;
+//    
+//    beta = pi/2.-this->star_obliquity;
+//
+//    xperp = x*cos(this->obliquity)-y*sin(this->obliquity);
+//    yperp = x*sin(this->obliquity)+y*cos(this->obliquity);
+//    zperp = sqrt(1-xperp**2-yperp**2);
+//
+//    zprime = zperp*cos(beta)-yperp*sin(beta);
+//    yprime = zperp*sin(beta)+yperp*cos(beta);
+//
+//    vstel = xperp*veq*sin(phi)*(1-alpha*yprime**2);
+//
+//    return 
+//}
 
 void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo){
-			printf("#Starting integration\n");
+			//printf("#Starting integration\n");
 			double planet_position_x = 0;
 			double planet_position_y = 0;
 			long double current_flux = 0;
@@ -126,7 +172,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 			  current_flux = 0;
 				if(d_to_p <= r_of_p + r_of_s){
 					//if(a%15==0){
-					if(a>890 && a<891){
+					if(a>780 && a<781){
 						// IMG
 						FILE *image; // IMG
 						char imgname[100];// IMG
@@ -206,7 +252,7 @@ void SimpleModel::RelativeFlux(double *phase, int np, double *flux_out, int npo)
 				}
 			}
 					
-		printf("#Flux integration complete\n");
+		//printf("#Flux integration complete\n");
 };
 
 

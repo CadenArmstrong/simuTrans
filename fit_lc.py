@@ -10,16 +10,35 @@ import sys
 import emcee
 from parameter import parameter
 from Emceewrapper import mcmc_engine
+import ZeipelModel
+import LaraModel
 from simplemodel import SimpleModel as tmodel 
 import time
 import copy
-class Params():
+
+
+class PickalableSWIG:
+    def __setstate__(self, state):
+        self.__init__(*state['args'])
+
+    def __getstate__(self):
+        return {'args': self.args}
+
+class PickalableC(tmodel, PickalableSWIG):
+
+    def __init__(self, *args):
+        self.args = args
+        tmodel.__init__(self,*args)
+
+
+
+
+class Params(object):
     def __init__(self,options):
         self.paramarr=options.params
         vararr=np.zeros(len(self.paramarr)) 
         keyarr=[]
         self.lenfree=0
-        self.transitmodel=tmodel()
         self.qflag=False
         for i in xrange(len(self.paramarr)):
             vararr[i]=i
@@ -30,15 +49,18 @@ class Params():
             if self.paramarr[i].name=='q1':
                 self.qflag=True
         self.paradic=dict(zip(keyarr,vararr))
-        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'Mstar':1.0,'Rstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'P':3.0,'T0':0.0,'b2':0} 
+        self.requiredpara={'star_gridsize':1000,'u1':0.0,'u2':0.0,'gd_beta':0.0,'star_f':0.0,'phi':0.0,'Mstar':1.0,'Rstar':1.0,'Prot':8.4,'planet_gridsize':200,'b':0,'Rratio':0.1,'sma':0.03,'lambda':0.0,'e':0.0,'planet_f':0.0,'gd_flag':1,'P':3.0,'T0':0.0,'b2':0} 
         self.checkparam()
+        self.transitmodel=PickalableC(int(self.readpara('star_gridsize').val), int(self.readpara('planet_gridsize').val))
         return
     def __str__(self):
         string=""
         for key,value in self.paradic.iteritems():
             string+="%s\n" % (self.paramarr[int(value)])
         return string
+    def __call__(self, freeparamarr,lcdata):
 
+        return self.lc_chisq(freeparamarr,lcdata)
     def readpara(self,name):
         #print self.paradic[name]
         return self.paramarr[int(self.paradic[name])]
@@ -100,28 +122,52 @@ class Params():
             self.readpara('u1').val=u1
             self.readpara('u2').val=u2
         return 
-
-    def model(self,cadence):
-        phase=self.cal_phase(cadence)
+    def getshortcadence(self,jd,cadence):
+        tmax=np.max(jd)+cadence/2.
+        tmin=np.min(jd)-cadence/2.
+        ncadence=(tmax-tmin)/(1./60./24.)
+        shortcadence=tmin+np.arange(ncadence)*1./60./24. 
+        return shortcadence
+    def getlc(self,jd,cadence,shortcadence,model_sc):
+        model_lc=np.zeros(len(jd))
+        t0=shortcadence[0]
+        length=len(shortcadence)
+        index1=(((jd+0.5*cadence)-t0)/(1./60./24.)).astype(int)
+        index2=(((jd-0.5*cadence)-t0)/(1./60./24.)).astype(int)
+        np.where(index2<0,index2,0)
+        np.where(index1>(length-1),index1,length-1)
+        for i in xrange(len(model_lc)): 
+            model_lc[i]=np.mean(model_sc[index2[i]:(index1[i]+1)])
+        return model_lc
+    def model(self,jd,cadence=1./60./24.):
+        if cadence==1./60./24:
+            shortcadence=jd
+        else:
+            shortcadence=self.getshortcadence(jd,cadence)
+        phase=self.cal_phase(shortcadence)
         #phase=np.arcsin((np.arange(50)-25.)/25.*0.75/5000.)
         #print phase
-        model_lc=np.zeros(len(phase))
-        #print type(phase),type(model_lc)
-        self.transitmodel.RelativeFlux(phase,model_lc)
-        return model_lc
 
-    def cal_phase(self,cadence):
+        model_sc=np.zeros(len(phase))
+        #print type(phase),type(model_lc)
+        self.transitmodel.RelativeFlux(phase,model_sc)
+        if cadence==1./60./24:
+            return model_sc
+        else:
+            model_lc=self.getlc(jd,cadence,shortcadence,model_sc)
+            return model_lc
+    def cal_phase(self,jd):
         #calculate the phase of the planet orbit from the cadence
         period=self.readpara('P').val
         epoch=self.readpara('T0').val
 #phase=np.pi*((cadence-epoch)/period-np.round((cadence-epoch)/period))
-        phase=np.pi*2.*((cadence-epoch)/period-np.round((cadence-epoch)/period))
+        phase=np.pi*2.*((jd-epoch)/period-np.round((jd-epoch)/period))
         return phase 
 
     def check_init(self,lcdata):
         self.update()
         for i in xrange(len(lcdata)):
-            model_lc=self.model(lcdata[i].jd)
+            model_lc=self.model(lcdata[i].jd,lcdata[i].cadence)
             #for l in xrange(len(lcdata[i].jd)):
             #    print lcdata[i].jd[l],model_lc[l]
             try:
@@ -171,7 +217,8 @@ class Params():
         #groteq=1.9567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
         #print groteq
         #return
-        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val]))
+        print np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val,self.readpara('gd_flag').val])
+        self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val,self.readpara('gd_flag').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val*np.pi/180.,self.readpara('e').val, self.readpara('planet_f').val]))
         return
 
@@ -197,7 +244,7 @@ class Params():
         chisq=0
         for i in xrange(len(lcdata)):
             self.update()
-            model_lc=1.-self.model(lcdata[i].jd)
+            model_lc=1.-self.model(lcdata[i].jd,lcdata[i].cadence)
             x0 = [np.median(lcdata[i].mag)]
             
             def minfunc(x0):
@@ -228,6 +275,7 @@ def main():
     #print options
     #return
     fitparams=Params(options)
+
     MC=mcmc_engine(options)
     print fitparams
     #return

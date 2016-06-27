@@ -53,7 +53,7 @@ def fitlc_parse(options):
     #parse lc format
     try:
         setattr(options.lc,'infile',p.get('Section LC',"infile"))
-        setattr(options.lc,'cadence',p.get('Section LC',"cadence"))
+        setattr(options.lc,'cadence',eval(p.get('Section LC',"cadence")))
         if options.lc.infile=="":
             delattr(options.lc,'infile')
             raise ConfigParser.NoOptionError(p,'infile')

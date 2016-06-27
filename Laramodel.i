@@ -1,4 +1,4 @@
-%module ZeipelModel
+%module LaraModel
 %{
 #define SWIG_FILE_WITH_INIT
 %}
@@ -11,8 +11,8 @@ import_array();
 
 %{
 #include "GDmodel.h"
-#include "ZeipelModel.h"
+#include "LaraModel.h"
 %}
 
 %include "GDmodel.h"
-%include "ZeipelModel.h"
+%include "LaraModel.h"

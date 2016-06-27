@@ -18,6 +18,7 @@
 #define KEY_SS_OBLIQUITY 4 // the angle between the stellar spin with the sky plane
 #define KEY_SS_GROTEQ 5 // Constant for rotational rate of star, gravitation constant, and stellar mass
 #define KEY_SS_G_DARK 6 // Gravity darkening parameter
+#define KEY_SS_GDFLAG 7 // Gravity darkening parameter
 
 // **********************
 
@@ -38,7 +39,7 @@
 using namespace std;
 class SimpleModel{
 	public:
-		SimpleModel();
+		SimpleModel(int star_grid_size, int planet_grid_size);
 		~SimpleModel();
 		void SetupStar(double *star_params, int np);
 		void SetupPlanet(double *planet_params, int np);

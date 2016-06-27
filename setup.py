@@ -12,11 +12,23 @@ _simplemodel = Extension("_simplemodel",
             "simplemodel.cpp"],
         include_dirs = [numpy_include],
         )
+_ZeipelModel = Extension("_ZeipelModel",
+        ["Zeipelmodel_wrap.cxx",
+            "Zeipelmodel.cpp"],
+        include_dirs = [numpy_include],
+        )
+_LaraModel = Extension("_LaraModel",
+        ["Laramodel_wrap.cxx",
+            "Laramodel.cpp"],
+        include_dirs = [numpy_include],
+        )
+
+
 
 setup(name="Simutrans",
         author_email = "",
         url = "",
         version = "0.0.0",
-        py_modules = ["simplemodel"],
-        ext_modules = [_simplemodel])
+        py_modules = ["ZeipelModel","LaraModel","simplemodel"],
+        ext_modules = [_ZeipelModel,_LaraModel, _simplemodel])
 

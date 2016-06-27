@@ -3,6 +3,34 @@ import numpy as np
 from numpy import random
 import parameter
 import emcee
+
+def _pickle_method(method):
+    func_name = method.im_func.__name__
+    obj = method.im_self
+    cls = method.im_class
+    #print _unpickle_method,func_name,obj,cls
+    return _unpickle_method, (func_name, obj, cls)
+
+def _unpickle_method(func_name, obj, cls):
+    for cls in cls.mro():
+        print func_name,cls, cls.__dict__
+        try:
+            func = cls.__dict__[func_name]
+        except KeyError:
+            #print "KeyError in unpickle method"
+            pass
+        else:
+            raise
+            #print "###### other exceptions in unpicle_method"
+            #break
+        return func.__get__(obj, cls)
+
+import copy_reg
+import types
+copy_reg.pickle(types.MethodType, _pickle_method, _unpickle_method)
+
+
+
 class mcmc_engine():
     def __init__(self,options):
         self.nwalkers=options.mcmc.nwalkers
@@ -31,7 +59,8 @@ class mcmc_engine():
 
         #burn
 
-        sampler = emcee.EnsembleSampler(self.nwalkers, ndim, fitparams.lc_chisq, args=[lcdata],threads=self.nthreads)
+        #sampler = emcee.EnsembleSampler(self.nwalkers, ndim, fitparams.lc_chisq, args=[lcdata],threads=self.nthreads)
+        sampler = emcee.EnsembleSampler(self.nwalkers, ndim, fitparams, args=[lcdata],threads=self.nthreads)
 
         pos, prob, state = sampler.run_mcmc(p0, self.nburn)
 
