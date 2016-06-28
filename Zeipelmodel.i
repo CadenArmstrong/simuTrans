@@ -11,8 +11,8 @@ import_array();
 
 %{
 #include "GDmodel.h"
-#include "ZeipelModel.h"
+#include "Zeipelmodel.h"
 %}
 
 %include "GDmodel.h"
-%include "ZeipelModel.h"
+%include "Zeipelmodel.h"

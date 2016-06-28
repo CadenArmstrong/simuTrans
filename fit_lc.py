@@ -230,9 +230,9 @@ class Params(object):
         for i in xrange(self.lenfree):
             if self.paramarr[i].name=='phi' or self.paramarr[i].name=='lambda':
                 if self.paramarr[i].val>self.paramarr[i].xmax:
-                    self.paramarr[i]=self.paramarr[i]-180.*int((self.paramarr[i]-self.paramarr[i].xmin)/180.)
+                    self.paramarr[i].val=self.paramarr[i].val-180.*int((self.paramarr[i].val-self.paramarr[i].xmin)/180.)
                 if self.paramarr[i].val<self.paramarr[i].xmin:
-                    self.paramarr[i]=self.paramarr[i]+180.*int((-self.paramarr[i]+self.paramarr[i].xmax)/180.)
+                    self.paramarr[i].val=self.paramarr[i].val+180.*int((-self.paramarr[i].val+self.paramarr[i].xmax)/180.)
                 continue
             if self.paramarr[i].val>self.paramarr[i].xmax or self.paramarr[i].val<self.paramarr[i].xmin:
                 return False
@@ -292,7 +292,7 @@ def main():
     #del fitparams.transitmodel
     #print "after del"
     #print "end of check_init"
-    return
+    #return
     MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
