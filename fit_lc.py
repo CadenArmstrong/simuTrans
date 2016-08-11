@@ -178,8 +178,8 @@ class Params(object):
                 fig=plt.figure()
                 ax=fig.add_subplot(111)
                 #ax.plot(lcdata[i].jd,lcdata[i].mag,'.')
-                #ax.plot(lcdata[i].jd,model_lc,'.')
-                ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
+                ax.plot(lcdata[i].jd,model_lc,'.')
+                #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
                 #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag)-lcdata[i].mag,'+')
                 #ax.plot(lcdata[i].jd,1-model_lc+np.median(lcdata[i].mag),'+')
                 #ax.plot(lcdata[i].jd,model_lc-1+np.median(lcdata[i].mag),'+')
@@ -221,7 +221,7 @@ class Params(object):
         #groteq=1.9567/(self.readpara('Prot').val)**2./self.readpara('Mstar').val*self.readpara('Rstar').val**3.       
         #print groteq
         #return
-        print np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val,self.readpara('gd_flag').val])
+        #print np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val,self.readpara('gd_flag').val])
         self.transitmodel.SetupStar(np.array([self.readpara('star_gridsize').val,self.readpara('u1').val,self.readpara('u2').val,self.readpara('star_f').val,self.readpara('phi').val*np.pi/180.,groteq,self.readpara('gd_beta').val,self.readpara('gd_flag').val]))
         self.transitmodel.SetupPlanet(np.array([self.readpara('planet_gridsize').val,np.sqrt(self.readpara('b2').val),self.readpara('Rratio').val,1./self.readpara('sma').val,self.readpara('lambda').val*np.pi/180.,self.readpara('e').val, self.readpara('planet_f').val]))
         return
@@ -293,7 +293,8 @@ def main():
     #print "after del"
     #print "end of check_init"
     #return
-    MC.run_mcmc(fitparams,lcdata)
+    if not options.plot:
+        MC.run_mcmc(fitparams,lcdata)
     return
 if __name__=='__main__':
     main()
