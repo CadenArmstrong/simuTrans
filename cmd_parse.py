@@ -17,8 +17,12 @@ class fitlc_parse(object):
         p=optparse.OptionParser()
         p.add_option('--config','-c',default='example.cfg',help='the configuration file for the program')
         p.add_option('--plot','-p',default=False,action='store_true',help='enable plotting')
+        p.add_option('--infile','-i',default='',help='overwrite the input file from configure file')
+        p.add_option('--outfile','-o',default='',help='overwrite the output file from configure file')
         options,arguments=p.parse_args()
         #self.cfgfile="example.cfg"
+        self.infile=options.infile
+        self.output=options.outfile
         self.cfgfile=options.config
         self.plot=options.plot
         if not os.path.exists(self.cfgfile):

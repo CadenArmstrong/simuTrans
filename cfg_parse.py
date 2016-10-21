@@ -54,9 +54,12 @@ def fitlc_parse(options):
     try:
         setattr(options.lc,'infile',p.get('Section LC',"infile"))
         setattr(options.lc,'cadence',eval(p.get('Section LC',"cadence")))
-        if options.lc.infile=="":
-            delattr(options.lc,'infile')
-            raise ConfigParser.NoOptionError(p,'infile')
+        if options.infile=="":
+            if options.lc.infile=="":
+                delattr(options.lc,'infile')
+                raise ConfigParser.NoOptionError(p,'infile')
+        else:
+            setattr(options.lc,'infile',options.infile)
     except ConfigParser.MissingSectionHeaderError:	
         raise 'Error: Section LC missing, excute set_parse to see example.cfg'
     except ConfigParser.NoOptionError:
@@ -86,7 +89,10 @@ def fitlc_parse(options):
     setattr(options.mcmc,'nburn',int(p.get('Section MCMC',"nburn")))
     setattr(options.mcmc,'niter',int(p.get('Section MCMC',"niter")))
     setattr(options.mcmc,'nthreads',int(p.get('Section MCMC',"nthreads")))
-    setattr(options.mcmc,'output',p.get('Section MCMC',"output"))
+    if options.output=="":
+        setattr(options.mcmc,'output',p.get('Section MCMC',"output"))
+    else:
+        setattr(options.mcmc,'output',options.output)
 
     #parse parameter options
     freeparams=p.get('Section FreeParameters','freeparams').split(',')

@@ -36,7 +36,7 @@ def read_lc(options):
             raise IOError, "the input path for light curve file %s does not exist."
     try:
         if not os.path.exists(options.lc.inpath+'/'+options.lc.infile):
-            raise IOError, "the light curve file %s does not exist."
+            raise IOError, "the light curve file %s does not exist." % (options.lc.inpath+'/'+options.lc.infile)
 
         #tobedone, how to figure out the cadence
         #let's go with whitespace lcs first
