@@ -11,8 +11,8 @@ import_array();
 
 %{
 #include "GDmodel.h"
-#include "LaraModel.h"
+#include "Laramodel.h"
 %}
 
 %include "GDmodel.h"
-%include "LaraModel.h"
+%include "Laramodel.h"
